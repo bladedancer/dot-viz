@@ -1,0 +1,29 @@
+.source-control {
+    width: 260px;
+    display: flex;
+    padding: 10px 5px 5px 5px;
+}
+
+.source-toggle {
+    width: 200px;
+}
+
+.source-control .refresh {
+    margin-left: 10px;
+}
+
+.source-control .refresh svg.busy {
+    animation-name: ckw;
+    animation-duration: 5s;
+    animation-iteration-count: infinite;
+}
+
+@keyframes ckw {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}

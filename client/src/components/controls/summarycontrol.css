@@ -1,0 +1,28 @@
+
+.summary-control {
+}
+
+.summary-control .searchWrapper {
+    max-width: 500px;
+}
+
+.summary-control .searchBox {
+	border: none;
+    display: block;
+}
+
+.summary-control .chip {
+	background-color: #2196F3;
+}
+
+.summary-control .definitions .scope-title {
+    border-radius: 3px 3px;
+    padding: 6px 2px;
+    margin: 2px;
+    display: block;
+}
+
+
+.summary-control .optionListContainer {
+    z-index: 10;
+}
