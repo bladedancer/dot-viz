@@ -1,14 +1,16 @@
 import express from 'express';
 import db from './db.js';
 import { log, highlight, note } from './log.js';
-import StreamZip from 'node-stream-zip';
+import process from './fedprocessor.js';
 
 let api = express.Router();
 
 api.post('/fed', async (req, res) => {
     try {
-        await db.store(req.files.fed.name, req.files.fed.path);
-        res.json({ fed: req.files.fed.name });
+        const enitiyStores = await process(req.files.fed.name, req.files.fed.path);
+        // TODO - store the processed results
+        await db.store(req.files.fed.name, enitiyStores);
+        res.json(enitiyStores);
     } catch (err) {
         log.error(err);
         return res

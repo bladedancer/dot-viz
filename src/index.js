@@ -1,5 +1,5 @@
-//import db from './db.js';
-// import { spinner } from './spinner.js';
+import db from './db.js';
+import { spinner } from './spinner.js';
 import os from 'os';
 import config from './config.js';
 import api from './api.js';
@@ -18,19 +18,14 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-// parse data with connect-multiparty.
 app.use(formData.parse(options));
-// delete from the request all empty files (size == 0)
 app.use(formData.format());
-// change the file objects to fs.ReadStream
-//app.use(formData.stream());
-// union the body and the files
 app.use(formData.union());
 
 async function init() {
-    // spinner.text = 'Loading schema';
-    // spinner.start();
-    // db.init(() => spinner.stop());
+    spinner.text = 'Loading stores';
+    spinner.start();
+    db.init(() => spinner.stop());
 }
 
 app.use(express.static('client/dist'));

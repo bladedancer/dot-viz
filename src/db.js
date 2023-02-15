@@ -1,20 +1,27 @@
 import config from './config.js';
 import { log, highlight, note } from './log.js';
-import { spinner } from './spinner.js';
 import fs from 'fs/promises';
-import StreamZip from 'node-stream-zip';
 import path from 'path';
+
+const ENTITYSTORES = 'entitystores.json';
 
 async function storeNames() {
     let feds = (await fs.readdir(config.STORE_PATH, { withFileTypes: true }))
         .filter((dirent) => dirent.isDirectory())
-        .map((dirent) => dirent.name);
+        .map((dirent) => ({
+            name: dirent.name,
+            entityStores: path.join(
+                config.STORE_PATH,
+                dirent.name,
+                ENTITYSTORES
+            ),
+        }));
     return feds;
 }
 
 async function folderExists(path) {
-    const result = await fs.stat(path).catch(err => {
-        if (isErrorNotFound(err)) {
+    const result = await fs.stat(path).catch((err) => {
+        if (err.code === 'ENOENT') {
             return false;
         }
         throw err;
@@ -31,14 +38,20 @@ class DBStore {
 
     async loadFromStore() {
         let paths = await storeNames();
-        console.log(paths);
-        // TODO LOAD THE FED
 
-        // let rawDefs = await fs.readFile(paths.definitions);
-        // let rawInstances = await fs.readFile(paths.instances);
-        // this.definitions = JSON.parse(rawDefs);
-        // this.instances = JSON.parse(rawInstances);
-        return new Promise((resolve) => resolve()); // todo
+        return new Promise(async (resolve, reject) => {
+            for (let i = 0; i < paths.length; i++) {
+                let fedStore = paths[i];
+                try {
+                    let rawStores = await fs.readFile(fedStore.entityStores);
+                    this.feds[fedStore.name] = JSON.parse(rawStores);
+                } catch (err) {
+                    log.error(`Unable to load store ${fedStore}`, err);
+                    reject(err);
+                }
+            }
+            resolve(this.feds);
+        });
     }
 
     async load() {
@@ -46,17 +59,17 @@ class DBStore {
         return this.loadFromStore().then(() => (this.loading = false));
     }
 
-    async store(fedName, fedPath) {
+    async store(fedName, entityStores) {
         // Not particularly secure
-        const target = path.join(config.STORE_PATH, fedName);
-        const exists = await folderExists(target);
+        const targetDir = path.join(config.STORE_PATH, fedName);
+        const exists = await folderExists(targetDir);
         if (!exists) {
-            await fs.mkdir(target);
+            await fs.mkdir(targetDir);
         }
-        console.log(target, fedPath)
-        const zip = new StreamZip.async({ file: fedPath });
-        await zip.extract(null, target);
-        await zip.close();
+        await fs.writeFile(
+            path.join(targetDir, ENTITYSTORES),
+            JSON.stringify(entityStores, null, 2)
+        );
         return;
     }
 
