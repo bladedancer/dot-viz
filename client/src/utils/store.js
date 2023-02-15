@@ -9,7 +9,8 @@ const storeName = (storePath) => {
 };
 
 const processFile = async (storeEntry) => {
-    const fedText = await storeEntry.getData(new zip.TextWriter());
+    const fedTextWriter = new zip.TextWriter();
+    const fedText = await storeEntry.getData(fedTextWriter);
 
     const options = {
         ignoreAttributes: false,
@@ -105,6 +106,7 @@ const process = async (file) => {
         entityStore && entityStores.push(entityStore);
     }
 
+    await fedReader.close()
     return entityStores;
 }
 

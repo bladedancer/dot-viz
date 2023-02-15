@@ -1,5 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { FiUpload, FiRefreshCw } from 'react-icons/fi';
+import { useSetFed } from '../../hooks/useSettings';
 import process from '../../utils/store';
 import './fedcontrol.css';
 
@@ -7,16 +8,16 @@ const FedControl = ({}) => {
     const fedFile = useRef();
     const [busy, setBusy] = useState(false);
     const [selectedFile, setSelectedFile] = useState(null);
+    const { fed, setFed } = useSetFed();
 
     const processFile = useCallback(async () => {
         setBusy(true);
-        const store = await process(selectedFile);
-        console.log('store', store);
+        const fed = await process(selectedFile);
+        setFed(fed);
         setBusy(false);
     }, [selectedFile, setBusy]);
 
     const clearSelection = useCallback(async () => {
-        console.log('CLEARING');
         setSelectedFile(null);
         fedFile.current.value = '';
     }, [fedFile, setSelectedFile]);

@@ -6,19 +6,26 @@ import FedControl from './controls/FedControl.jsx';
 import FilterControl from './controls/FilterControl.jsx';
 import LayoutControl from './controls/LayoutControl.jsx';
 import ZoomControl from './controls/ZoomControl.jsx';
+import Graph from './Graph.jsx';
 import GraphSource from './GraphSource.jsx';
 
 const App = () => {
     const [settings, setSettings] = useState({
         contentModifiedTS: 0,
-        feds: [],
+        fed: null,
         source: 'entityTypes',
         selection: [],
-        sourceRefresh: {
-            busy: false,
+        // sourceRefresh: {
+        //     busy: false,
+        //     source: '',
+        //     ts: 0,
+        // },
+
+        graphData: {
             source: '',
-            ts: 0,
+            nodes: []
         },
+
         nodes: {
             filter: '',
             connected: false,
@@ -35,6 +42,7 @@ const App = () => {
     return (
         <SettingsProvider value={context}>
             <GraphSource />
+            <Graph />
             
             <ControlsContainer position={'top-left'}>
                 {/* <SourceControl /> */}

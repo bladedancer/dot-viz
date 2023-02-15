@@ -15,13 +15,23 @@ export function useSettingsContext() {
     return context;
 }
 
-export function useSetFeds() {
+export function useSetFed() {
     const { settings, setSettings } = useSettingsContext();
-    const getFeds = useCallback(() => settings.feds, [settings]);
+    const getFed = useCallback(() => settings.fed, [settings]);
 
     return {
-        feds: getFeds,
-        setFeds: (feds) => setSettings({...settings, feds, fedSelection: []})
+        fed: getFed,
+        setFed: (fed) => setSettings({...settings, fed, selection: []})
+    };
+}
+
+export function useSetGraphData() {
+    const { settings, setSettings } = useSettingsContext();
+    const getGraphData = useCallback(() => settings.graphData, [settings]);
+
+    return {
+        graphData: getGraphData,
+        setGraphData: (graphData) => setSettings({...settings, graphData, selection: []})
     };
 }
 
