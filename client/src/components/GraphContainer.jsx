@@ -4,7 +4,7 @@ import { SettingsProvider } from "../hooks/useSettings.js";
 const GraphContainer = ({ children }) => {
   const [settings, setSettings] = useState({
       contentModifiedTS: 0,
-      source: "definitions",
+      source: "entityTypes",
       selection: [],
       sourceRefresh: {
         busy: false,

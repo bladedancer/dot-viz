@@ -1,6 +1,12 @@
 .fed-control {
-    display: flex;
-    flex-direction: row;
-    width: auto;
+    border: none;
+    width: 100%
 }
 
+.fed-control button {
+    width: 100%
+}
+
+.fed-control svg {
+    margin-right: 5px;
+}

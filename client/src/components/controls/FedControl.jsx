@@ -1,40 +1,52 @@
-import React, { useState, useCallback } from 'react';
-import { useCy } from '../../hooks/useCy.js';
+import React, { useState, useCallback, useEffect } from 'react';
 import { FiUpload, FiRefreshCw } from 'react-icons/fi';
 import './fedcontrol.css';
 
-const FedControl = () => {
-    const [selectedFile, setSelectedFile] = useState(null);
+const FedControl = ({}) => {
     const [busy, setBusy] = useState(false);
-    const cy = useCy();
+    const [selectedFile, setSelectedFile] = useState(null);
 
     const onFileUpload = useCallback(async () => {
+        console.log('onFileUpload');
         setBusy(true);
-        // Create an object of formData
         const formData = new FormData();
-
-        // Update the formData object
-        formData.append(
-            'fed',
-            selectedFile,
-            selectedFile.name
-        );
+        formData.append('fed', selectedFile, selectedFile.name);
 
         await fetch('/api/feds', {
             method: 'POST',
             body: formData,
         });
+
+        // TODO: Catch the response and set the state
         setBusy(false);
     }, [selectedFile, setBusy]);
+
+    useEffect(async () => {
+        console.log(selectedFile)
+        if (selectedFile) {
+            await onFileUpload();
+        }
+    }, [selectedFile, onFileUpload]);
 
     return (
         <>
             <div className="react-cy-control fed-control">
-                <input type="file" onChange={(e) => setSelectedFile(e.target.files[0])} disabled={busy} />
-                <button onClick={onFileUpload} disabled={busy}>
-                    {busy && <FiRefreshCw />}
-                    {!busy && <FiUpload />}
+                <button>
+                    <label htmlFor="fedFile">
+                        {busy && <FiRefreshCw />}
+                        {!busy && <FiUpload />}
+                        Upload Fed
+                    </label>
                 </button>
+                <input
+                    id="fedFile"
+                    type="file"
+                    style={{ visibility: 'hidden' }}
+                    onChange={(e) =>
+                        setSelectedFile(e.target.files[0])
+                    }
+                    disabled={busy}
+                />
             </div>
         </>
     );

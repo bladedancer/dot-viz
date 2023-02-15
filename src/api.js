@@ -7,7 +7,7 @@ let api = express.Router();
 
 api.get('/feds', async (req, res) => {
     try {
-        res.json(Object.keys(db.feds()));
+        res.json(Object.keys(db.feds()).sort());
     } catch (err) {
         log.error(err);
         return res

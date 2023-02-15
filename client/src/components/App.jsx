@@ -1,27 +1,53 @@
-import React, { useState, useEffect } from 'react';
-import GraphContainer from './GraphContainer.jsx';
+import React, { useState, useEffect, useMemo } from 'react';
+import { SettingsProvider } from '../hooks/useSettings.js';
+import ControlsContainer from './controls/ControlsContainer.jsx';
+import ExportControl from './controls/ExportControl.jsx';
+import FedControl from './controls/FedControl.jsx';
+import FilterControl from './controls/FilterControl.jsx';
+import SourceControl from './controls/SourceControl.jsx';
+import LayoutControl from './controls/LayoutControl.jsx';
+import ZoomControl from './controls/ZoomControl.jsx';
 import GraphSource from './GraphSource.jsx';
-import WithLoading from './WithLoading.jsx';
 
 const App = () => {
-  const GraphWithLoading = WithLoading(GraphContainer)
-  const [appState, setAppState] = useState({
-    loading: true
-  });
+    const [settings, setSettings] = useState({
+        contentModifiedTS: 0,
+        feds: [],
+        source: 'entityTypes',
+        selection: [],
+        sourceRefresh: {
+            busy: false,
+            source: '',
+            ts: 0,
+        },
+        nodes: {
+            filter: '',
+            connected: false,
+            direction: 'both',
+        },
+        edges: {
+            scope: true,
+            hard: true,
+            soft: true,
+        },
+    });
+    const context = useMemo(() => ({ settings, setSettings }), [settings]);
 
-  useEffect(() => {
-    setAppState({ loading: true });
-    fetch('/api/wait')
-      .then(() => {
-        setAppState({ loading: false });
-      });
-  }, [setAppState]);
-
-  return (
-      <GraphWithLoading isLoading={appState.loading} >
-        <GraphSource />
-      </GraphWithLoading>
-  );
-}
+    return (
+        <SettingsProvider value={context}>
+            <GraphSource />
+            
+            <ControlsContainer position={'top-left'}>
+                <SourceControl />
+                {/* <FilterControl /> */}
+                <ExportControl />
+            </ControlsContainer>
+            <ControlsContainer position={'bottom-right'}>
+                <ZoomControl />
+                <LayoutControl />
+            </ControlsContainer>
+        </SettingsProvider>
+    );
+};
 
 export default App;

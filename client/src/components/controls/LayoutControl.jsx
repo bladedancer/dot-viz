@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useState, useMemo, useRef } from "react"
 import { FiGrid, FiPlay, FiPause, FiSettings } from "react-icons/fi";
 import Form from "@rjsf/core";
 import { useCy } from "../../hooks/useCy";
-import { useSetContentModifiedTS } from "../../hooks/useSettings.js";
 import Cytoscape from "cytoscape";
 import COSEBilkent from "cytoscape-cose-bilkent";
 import avsdf from "cytoscape-avsdf";
@@ -1508,7 +1507,6 @@ const LayoutControl = ({
   const [layoutOverrides, setLayoutOverrides] = useState({});
   const [layout, setLayout] = useState("breadthfirst");
   const [activeLayout, setActiveLayout] = useState();
-  const {contentModifiedTS} = useSetContentModifiedTS();
   const isMounted = useRef(false);
 
   // Common html props for the div wrapper
@@ -1554,7 +1552,7 @@ const LayoutControl = ({
     }
     await stopLayout();
     await runLayout()
-  }, [cy, contentModifiedTS(), layout]);
+  }, [cy, layout]);
 
   // Disable stop button when layout auto-stops
   useEffect(async () => {

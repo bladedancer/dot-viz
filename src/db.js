@@ -70,6 +70,7 @@ class DBStore {
             path.join(targetDir, ENTITYSTORES),
             JSON.stringify(entityStores, null, 2)
         );
+        this.feds[fedName] = entityStores;
         return;
     }
 
