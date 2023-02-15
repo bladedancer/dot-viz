@@ -20,7 +20,7 @@ const FedControl = () => {
             selectedFile.name
         );
 
-        await fetch('/api/fed', {
+        await fetch('/api/feds', {
             method: 'POST',
             body: formData,
         });
