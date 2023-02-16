@@ -278,12 +278,12 @@ const GraphSource = ({ children }) => {
     const { feds, setFeds } = useSetFeds();
 
     // Load the feds
-    useEffect(async () => {
-        let models = await Promise.all([
-            fetch('/api/feds').then((resp) => resp.json()),
-        ]);
-        setFeds(models[0]);
-    }, []); // TODO NEED REFRESH
+    // useEffect(async () => {
+    //     let models = await Promise.all([
+    //         fetch('/api/feds').then((resp) => resp.json()),
+    //     ]);
+    //     setFeds(models[0]);
+    // }, []); // TODO NEED REFRESH
 
 
     // const { settings, setSettings } = useSettingsContext();

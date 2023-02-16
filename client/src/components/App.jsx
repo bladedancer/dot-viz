@@ -4,7 +4,6 @@ import ControlsContainer from './controls/ControlsContainer.jsx';
 import ExportControl from './controls/ExportControl.jsx';
 import FedControl from './controls/FedControl.jsx';
 import FilterControl from './controls/FilterControl.jsx';
-import SourceControl from './controls/SourceControl.jsx';
 import LayoutControl from './controls/LayoutControl.jsx';
 import ZoomControl from './controls/ZoomControl.jsx';
 import GraphSource from './GraphSource.jsx';
@@ -38,8 +37,9 @@ const App = () => {
             <GraphSource />
             
             <ControlsContainer position={'top-left'}>
-                <SourceControl />
+                {/* <SourceControl /> */}
                 {/* <FilterControl /> */}
+                <FedControl />
                 <ExportControl />
             </ControlsContainer>
             <ControlsContainer position={'bottom-right'}>

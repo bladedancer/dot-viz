@@ -1,5 +1,5 @@
-import StreamZip from 'node-stream-zip';
-import { XMLParser, XMLBuilder, XMLValidator } from 'fast-xml-parser';
+import * as zip from "@zip.js/zip.js";
+import { XMLParser } from 'fast-xml-parser';
 
 const storeName = (storePath) => {
     var base = new String(storePath).substring(storePath.lastIndexOf('/') + 1);
@@ -8,32 +8,8 @@ const storeName = (storePath) => {
     return base;
 };
 
-const process = async (fedName, fedPath) => {
-    const zip = new StreamZip.async({ file: fedPath });
-
-    const entries = await zip.entries();
-    const entityStores = [];
-
-    for (const entry of Object.values(entries)) {
-        if (entry.isDirectory) {
-            continue;
-        }
-
-        if (entry.name.startsWith('META-INF') || !entry.name.endsWith('.xml')) {
-            // Skip the manifest for now - we'll assume a fed
-            continue;
-        }
-
-        const entityStore = await processFile(zip, entry);
-        entityStores.push(entityStore);
-    }
-
-    await zip.close();
-    return entityStores;
-};
-
-const processFile = async (zip, entry) => {
-    const data = await zip.entryData(entry);
+const processFile = async (storeEntry) => {
+    const fedText = await storeEntry.getData(new zip.TextWriter());
 
     const options = {
         ignoreAttributes: false,
@@ -42,10 +18,10 @@ const processFile = async (zip, entry) => {
     };
     const parser = new XMLParser(options);
 
-    let obj = parser.parse(data);
+    let obj = parser.parse(fedText);
 
     const store = {
-        name: storeName(entry.name),
+        name: storeName(storeEntry.filename),
         entityTypes: [],
         entities: [],
     };
@@ -115,5 +91,21 @@ const processEntityType = (entityType) => {
 const processEntity = (entity) => {
     // TODO process the entities
 };
+
+const process = async (file) => {
+    const fedReader = new zip.ZipReader(new zip.BlobReader(file));
+
+    const xmlEntries = (await fedReader.getEntries()).filter((e) => 
+        e.filename.endsWith(".xml")
+    );
+
+    const entityStores = [];
+    for (let i = 0; i < xmlEntries.length; i++) {
+        const entityStore = await processFile(xmlEntries[i]);
+        entityStore && entityStores.push(entityStore);
+    }
+
+    return entityStores;
+}
 
 export default process;

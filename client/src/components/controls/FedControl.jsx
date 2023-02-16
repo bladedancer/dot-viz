@@ -1,32 +1,31 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { FiUpload, FiRefreshCw } from 'react-icons/fi';
+import process from '../../utils/store';
 import './fedcontrol.css';
 
 const FedControl = ({}) => {
+    const fedFile = useRef();
     const [busy, setBusy] = useState(false);
     const [selectedFile, setSelectedFile] = useState(null);
 
-    const onFileUpload = useCallback(async () => {
-        console.log('onFileUpload');
+    const processFile = useCallback(async () => {
         setBusy(true);
-        const formData = new FormData();
-        formData.append('fed', selectedFile, selectedFile.name);
-
-        await fetch('/api/feds', {
-            method: 'POST',
-            body: formData,
-        });
-
-        // TODO: Catch the response and set the state
+        const store = await process(selectedFile);
+        console.log('store', store);
         setBusy(false);
     }, [selectedFile, setBusy]);
 
+    const clearSelection = useCallback(async () => {
+        console.log('CLEARING');
+        setSelectedFile(null);
+        fedFile.current.value = '';
+    }, [fedFile, setSelectedFile]);
+
     useEffect(async () => {
-        console.log(selectedFile)
         if (selectedFile) {
-            await onFileUpload();
+            await processFile();
         }
-    }, [selectedFile, onFileUpload]);
+    }, [selectedFile, processFile]);
 
     return (
         <>
@@ -39,12 +38,12 @@ const FedControl = ({}) => {
                     </label>
                 </button>
                 <input
+                    ref={fedFile}
                     id="fedFile"
                     type="file"
                     style={{ visibility: 'hidden' }}
-                    onChange={(e) =>
-                        setSelectedFile(e.target.files[0])
-                    }
+                    onChange={(e) => setSelectedFile(e.target.files[0])}
+                    onClick={clearSelection}
                     disabled={busy}
                 />
             </div>
