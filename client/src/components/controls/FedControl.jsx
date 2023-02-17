@@ -35,7 +35,7 @@ const FedControl = ({}) => {
                     <label htmlFor="fedFile">
                         {busy && <FiRefreshCw />}
                         {!busy && <FiUpload />}
-                        Upload Fed
+                        Open Fed
                     </label>
                 </button>
                 <input
