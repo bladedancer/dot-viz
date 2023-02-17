@@ -16,7 +16,6 @@ jobs:
           fetch-depth: 0
       - name: Push to GH pages
         env:
-          ACCESS_TOKEN: ${{ secrets.TOKEN }}
+          token: ${{ secrets.TOKEN }}
         run: |
-          git remote set-url origin https://${ACCESS_TOKEN}@github.com/bladedancer/fed-viz.git 
           git push origin `git subtree split --prefix client/dist master`:gh-pages --force
