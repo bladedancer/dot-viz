@@ -8,5 +8,5 @@ app.use(cors());
 app.use(express.static('client/dist'));
 
 app.listen(config.PORT, async () => {
-    log.info(`API Server Viz listening on port ${config.PORT}`);
+    log.info(`Fed Viz listening on port ${config.PORT}`);
 });
