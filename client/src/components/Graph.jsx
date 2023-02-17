@@ -22,7 +22,6 @@ const Graph = ({children}) => {
                     id: n.id,
                     label: n.name,
                     color: n.color,
-                    linkType: n.refType,
                     root: !n.extends
                 },
                 classes: `${n.isRoot ? 'root-node ' : ''}`
@@ -37,13 +36,13 @@ const Graph = ({children}) => {
                 }
                 els.push({
                     data: {
-                        id: l.source + '-' + l.target,
+                        id: `${l.linkType}-${l.source}-${l.target}`,
                         source: l.source,
                         target: l.target,
                         sourceColor: n.color,
                         targetColor: targetNode.color,
                         gradient: `${n.color} ${targetNode.color}`,
-                        type: l.refType
+                        linkType: l.linkType
                     }
                 });
             });

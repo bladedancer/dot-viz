@@ -32,9 +32,10 @@ const App = () => {
             direction: 'both',
         },
         edges: {
-            scope: true,
-            hard: true,
-            soft: true,
+            extends: true,
+            component: true,
+            referenceHard: true,
+            referenceSoft: true,
         },
     });
     const context = useMemo(() => ({ settings, setSettings }), [settings]);
@@ -46,8 +47,8 @@ const App = () => {
             
             <ControlsContainer position={'top-left'}>
                 {/* <SourceControl /> */}
-                {/* <FilterControl /> */}
                 <FedControl />
+                <FilterControl />
                 <ExportControl />
             </ControlsContainer>
             <ControlsContainer position={'bottom-right'}>

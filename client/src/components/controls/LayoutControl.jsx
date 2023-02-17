@@ -652,7 +652,7 @@ const supportedLayouts = {
 
         // Divisor to compute edge forces
         edgeElasticity: function (edge) {
-            switch (edge.data('refType')) {
+            switch (edge.data('linkType')) {
                 case 'extends':
                     return supportedLayouts.cose.edgeElasticityExtends || 32;
                 case 'component':
@@ -674,7 +674,7 @@ const supportedLayouts = {
 
         // Ideal edge (non nested) length
         idealEdgeLength: function (edge) {
-            switch (edge.data('refType')) {
+            switch (edge.data('linkType')) {
                 case 'extends':
                     return supportedLayouts.cose.idealEdgeLengthExtends || 32;
                 case 'component':
@@ -1091,7 +1091,7 @@ const supportedLayouts = {
         // - This acts as a hint for the edge length
         // - The edge length can be longer or shorter if the forces are set to extreme values
         springLength: (edge) => {
-            switch (edge.data('refType')) {
+            switch (edge.data('linkType')) {
                 case 'extends':
                     return supportedLayouts.euler.springLengthExtends || 80;
                 case 'component':
@@ -1110,7 +1110,7 @@ const supportedLayouts = {
         // - Lower values give looser springs
         // - Higher values give tighter springs
         springCoeff: (edge) => {
-            switch (edge.data('refType')) {
+            switch (edge.data('linkType')) {
                 case 'extends':
                     return supportedLayouts.euler.springCoeffExtends || 0.0008;
                 case 'component':
@@ -1285,7 +1285,7 @@ const supportedLayouts = {
         packComponents: false,
         nodeRepulsion: (n) => (n.data('isRoot') ? 8000 : 4500),
         idealEdgeLength: (e) => {
-            let type = e.data('refType');
+            let type = e.data('linkType');
             if (type === 'extends') {
                 return 50;
             } else if (type === 'component') {
@@ -1295,7 +1295,7 @@ const supportedLayouts = {
             }
         },
         edgeElasticity: (e) => {
-            let type = e.data('refType');
+            let type = e.data('linkType');
             if (type === 'extends') {
                 return 0.1;
             } else if (e.type === 'component') {

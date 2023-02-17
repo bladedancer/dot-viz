@@ -58,7 +58,7 @@ const processEntityType = (entityType) => {
         });
 
     if (entityType.componentType && Array.isArray(entityType.componentType)) {
-        entityType.componentType.forEach((c) => addComponent);
+        entityType.componentType.forEach((c) => addComponent(c));
     } else if (entityType.componentType) {
         // Single obj
         addComponent(entityType.componentType);
@@ -76,11 +76,11 @@ const processEntityType = (entityType) => {
 
     if (entityType.field && Array.isArray(entityType.field)) {
         entityType.field
-            .filter((f) => f.attributes.type.startsWith('^'))
-            .forEach((c) => addComponent);
+            .filter((f) => f.attributes.type.startsWith('^') || f.attributes.type.startsWith('@'))
+            .forEach((f) => addReference(f));
     } else if (
         entityType.field &&
-        entityType.field.attributes.type.startsWith('^')
+        (entityType.field.attributes.type.startsWith('^') || entityType.field.attributes.type.startsWith('@'))
     ) {
         // Single obj
         addReference(entityType.field);

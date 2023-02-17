@@ -40,7 +40,7 @@ function linkExtends(n) {
         {
             source: n.id,
             target: n.extends,
-            refType: LINK_TYPE_EXTENDS,
+            linkType: LINK_TYPE_EXTENDS,
             size: 1,
             type: 'line',
             color: chroma(n.color).alpha(0.5).hex(),
@@ -52,9 +52,9 @@ function linkExtends(n) {
 
 function linkComponents(n) {
     return n.components.map((c) => ({
-        source: c.name,
-        target: n.id,
-        refType: LINK_TYPE_COMPONENT,
+        source: n.id,
+        target: c.name,
+        linkType: LINK_TYPE_COMPONENT,
         size: 1,
         type: 'arrow',
         color: chroma(n.color).alpha(0.5).hex(),
@@ -67,8 +67,8 @@ function linkReferences(n) {
     return n.references.map((r) => ({
         source: n.id,
         target: r.type,
-        refType: LINK_TYPE_REFERENCE,
-        isHard: c.hard,
+        linkType: LINK_TYPE_REFERENCE,
+        isHard: r.hard,
         size: 1,
         type: 'arrow',
         color: chroma(n.color).alpha(0.5).hex(),
@@ -98,7 +98,6 @@ function nodifyEntityTypes(fed) {
                     isRoot: entityType.extends === 'Entity',
                     raw: entityType.raw,
                     links: [],
-                    references: [], // todo
                     color: color(i, fed.length),
                 };
             }),

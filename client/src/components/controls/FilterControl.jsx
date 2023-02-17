@@ -38,7 +38,6 @@ const FilterControl = () => {
             if ((nf.filter || nf.ids) && nf.connected) {
                 cy.nodes(':visible').forEach((root) => {
                     let nodes = cy.collection();
-                    console.log(nf);
                     if (
                         !nf.direction ||
                         nf.direction === 'both' ||
@@ -60,12 +59,13 @@ const FilterControl = () => {
                             root,
                             goal,
                             weight: (e) => {
-                                let type = e.data('type');
+                                let linkType = e.data('linkType');
                                 // TODO: DIRECTION
                                 if (
-                                    (type == 'scope' && ef.scope) ||
-                                    (type == 'hard' && ef.hard) ||
-                                    (type == 'soft' && ef.soft)
+                                    (linkType == 'extends' && ef.extends) ||
+                                    (linkType == 'component' && ef.component) ||
+                                    (linkType == 'reference' && e.data('isHard')  && ef.referenceHard) ||
+                                    (linkType == 'reference' && e.data('isSoft')  && ef.referenceSoft) 
                                 ) {
                                     // Along an enabled edge
                                     return 1;
@@ -83,13 +83,15 @@ const FilterControl = () => {
             }
 
             cy.edges().forEach((e) => {
-                let type = e.data('type');
-                if (type == 'scope') {
-                    ef.scope ? e.show() : e.hide();
-                } else if (type == 'hard') {
-                    ef.hard ? e.show() : e.hide();
-                } else if (type == 'soft') {
-                    ef.soft ? e.show() : e.hide();
+                let linkType = e.data('linkType');
+                if (linkType == 'extends') {
+                    ef.extends ? e.show() : e.hide();
+                } else if (linkType == 'component') {
+                    ef.component ? e.show() : e.hide();
+                } else if (linkType == 'reference') {
+                    const isHard = e.data('isHard');
+                    (isHard && ef.referenceHard) ? e.show() : e.hide();
+                    (!isHard && ef.referenceSoft) ? e.show() : e.hide();
                 }
             });
         });
@@ -156,28 +158,36 @@ const FilterControl = () => {
                 )}
                 <div className="edge-filter-control">
                     <Toggle
-                        checked={edgeFilter().scope}
+                        checked={edgeFilter().extends}
                         onChange={() =>
-                            setEdgeFilter({ scope: !edgeFilter().scope })
+                            setEdgeFilter({ extends: !edgeFilter().extends })
                         }
                     >
-                        Scope
+                        Inheritance
                     </Toggle>
                     <Toggle
-                        checked={edgeFilter().hard}
+                        checked={edgeFilter().component}
                         onChange={() =>
-                            setEdgeFilter({ hard: !edgeFilter().hard })
+                            setEdgeFilter({ component: !edgeFilter().component })
                         }
                     >
-                        Hard
+                        Component
                     </Toggle>
                     <Toggle
-                        checked={edgeFilter().soft}
+                        checked={edgeFilter().referenceHard}
                         onChange={() =>
-                            setEdgeFilter({ soft: !edgeFilter().soft })
+                            setEdgeFilter({ referenceHard: !edgeFilter().referenceHard })
                         }
                     >
-                        Soft
+                        Hard Reference
+                    </Toggle>
+                    <Toggle
+                        checked={edgeFilter().referenceSoft}
+                        onChange={() =>
+                            setEdgeFilter({ referenceSoft: !edgeFilter().referenceSoft })
+                        }
+                    >
+                        Soft Reference
                     </Toggle>
                 </div>
             </div>

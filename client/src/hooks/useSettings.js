@@ -82,34 +82,34 @@ export function useSetSelection() {
 //     };
 // }
 
-// export function useSetNodeFilter() {
-//     const { settings, setSettings } = useSettingsContext();
-//     const getNodeFilter = useCallback(() => settings.nodes, [settings]);
+export function useSetNodeFilter() {
+    const { settings, setSettings } = useSettingsContext();
+    const getNodeFilter = useCallback(() => settings.nodes, [settings]);
 
-//     return {
-//         nodeFilter: getNodeFilter,
-//         setNodeFilter: (nodeFilter) => setSettings({
-//             ...settings,
-//             nodes: {
-//                 ...settings.nodes,
-//                 ...nodeFilter
-//             }
-//         })
-//     };
-// }
+    return {
+        nodeFilter: getNodeFilter,
+        setNodeFilter: (nodeFilter) => setSettings({
+            ...settings,
+            nodes: {
+                ...settings.nodes,
+                ...nodeFilter
+            }
+        })
+    };
+}
 
-// export function useSetEdgeFilter() {
-//     const { settings, setSettings } = useSettingsContext();
-//     const getEdgeFilter = useCallback(() => settings.edges, [settings]);
+export function useSetEdgeFilter() {
+    const { settings, setSettings } = useSettingsContext();
+    const getEdgeFilter = useCallback(() => settings.edges, [settings]);
 
-//     return {
-//         edgeFilter: getEdgeFilter,
-//         setEdgeFilter: (edgeFilter) => setSettings({
-//             ...settings,
-//             edges: {
-//                 ...settings.edges,
-//                 ...edgeFilter
-//             }
-//         })
-//     };
-// }
+    return {
+        edgeFilter: getEdgeFilter,
+        setEdgeFilter: (edgeFilter) => setSettings({
+            ...settings,
+            edges: {
+                ...settings.edges,
+                ...edgeFilter
+            }
+        })
+    };
+}
