@@ -25,7 +25,7 @@ function nodify(fed, source) {
     if (source === 'entityTypes') {
         data = { ...data, ...nodifyEntityTypes(fed) };
     } else if (source === 'entities') {
-        //data = { ...data, ...nodifyInstances(fed.entities) };
+        data = { ...data, ...nodifyEntities(fed) };
     }
 
     return data;
@@ -114,6 +114,71 @@ function nodifyEntityTypes(fed) {
         ];
     });
 
+    return { nodes };
+}
+
+function linkEntityParent(n) {
+    if (!n.parent) {
+        return [];
+    }
+
+    return [
+        {
+            source: n.id,
+            target: n.parent,
+            linkType: LINK_TYPE_COMPONENT,
+            size: 1,
+            type: 'line',
+            color: chroma(n.color).alpha(0.5).hex(),
+            weight: 10,
+            cardinality: '1',
+        },
+    ];
+}
+
+function nodifyEntities(fed) {
+    let nodes = [];
+    let allEntities = {};
+
+    const name = (e) => {
+        const nameField = e.fields.find((f) => (f.attributes.name === 'name'));
+        return nameField ? `${('' + nameField.value).substring(0, 20)} (${e.type})` : e.type;
+    };
+
+    for (let i = 0; i < fed.length; i++) {
+        if (!fed[i].entities.length) {
+            continue;
+        }
+
+        nodes = [
+            ...nodes,
+            ...fed[i].entities
+                .filter((e) => e.name !== 'Root')
+                .map((entity) => {
+                    return {
+                        id: entity.id,
+                        group: fed[i].name,
+                        name: name(entity),
+                        parent: entity.parent,
+                        isRoot: !entity.parent,
+                        raw: entity.raw,
+                        links: [],
+                        color: color(i, fed.length),
+                    };
+                }),
+        ];
+    }
+
+    // // Node Links: Extends
+    nodes.forEach((n) => {
+        n.links = [
+            ...n.links,
+            ...linkEntityParent(n),
+            // ...linkReferences(n),
+        ];
+    });
+
+    console.log(nodes);
     return { nodes };
 }
 

@@ -1,12 +1,17 @@
 import React, { useEffect } from 'react';
 import { useCy } from '../../hooks/useCy.js';
-import { useSetNodeFilter, useSetEdgeFilter } from '../../hooks/useSettings.js';
+import {
+    useSetNodeFilter,
+    useSetEdgeFilter,
+    useSetSource,
+} from '../../hooks/useSettings.js';
 import Toggle from '../utils/Toggle.jsx';
 import SlideToggle from '../utils/SlideToggle.jsx';
 import './filtercontrol.css';
 
 const FilterControl = () => {
     const cy = useCy();
+    const { source } = useSetSource();
     const { nodeFilter, setNodeFilter } = useSetNodeFilter();
     const { edgeFilter, setEdgeFilter } = useSetEdgeFilter();
 
@@ -64,8 +69,12 @@ const FilterControl = () => {
                                 if (
                                     (linkType == 'extends' && ef.extends) ||
                                     (linkType == 'component' && ef.component) ||
-                                    (linkType == 'reference' && e.data('isHard')  && ef.referenceHard) ||
-                                    (linkType == 'reference' && e.data('isSoft')  && ef.referenceSoft) 
+                                    (linkType == 'reference' &&
+                                        e.data('isHard') &&
+                                        ef.referenceHard) ||
+                                    (linkType == 'reference' &&
+                                        e.data('isSoft') &&
+                                        ef.referenceSoft)
                                 ) {
                                     // Along an enabled edge
                                     return 1;
@@ -90,8 +99,8 @@ const FilterControl = () => {
                     ef.component ? e.show() : e.hide();
                 } else if (linkType == 'reference') {
                     const isHard = e.data('isHard');
-                    (isHard && ef.referenceHard) ? e.show() : e.hide();
-                    (!isHard && ef.referenceSoft) ? e.show() : e.hide();
+                    isHard && ef.referenceHard ? e.show() : e.hide();
+                    !isHard && ef.referenceSoft ? e.show() : e.hide();
                 }
             });
         });
@@ -157,18 +166,24 @@ const FilterControl = () => {
                     />
                 )}
                 <div className="edge-filter-control">
-                    <Toggle
-                        checked={edgeFilter().extends}
-                        onChange={() =>
-                            setEdgeFilter({ extends: !edgeFilter().extends })
-                        }
-                    >
-                        Inheritance
-                    </Toggle>
+                    {source() === 'entityTypes' && (
+                        <Toggle
+                            checked={edgeFilter().extends}
+                            onChange={() =>
+                                setEdgeFilter({
+                                    extends: !edgeFilter().extends,
+                                })
+                            }
+                        >
+                            Inheritance
+                        </Toggle>
+                    )}
                     <Toggle
                         checked={edgeFilter().component}
                         onChange={() =>
-                            setEdgeFilter({ component: !edgeFilter().component })
+                            setEdgeFilter({
+                                component: !edgeFilter().component,
+                            })
                         }
                     >
                         Component
@@ -176,7 +191,9 @@ const FilterControl = () => {
                     <Toggle
                         checked={edgeFilter().referenceHard}
                         onChange={() =>
-                            setEdgeFilter({ referenceHard: !edgeFilter().referenceHard })
+                            setEdgeFilter({
+                                referenceHard: !edgeFilter().referenceHard,
+                            })
                         }
                     >
                         Hard Reference
@@ -184,7 +201,9 @@ const FilterControl = () => {
                     <Toggle
                         checked={edgeFilter().referenceSoft}
                         onChange={() =>
-                            setEdgeFilter({ referenceSoft: !edgeFilter().referenceSoft })
+                            setEdgeFilter({
+                                referenceSoft: !edgeFilter().referenceSoft,
+                            })
                         }
                     >
                         Soft Reference

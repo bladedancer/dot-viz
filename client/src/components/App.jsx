@@ -5,6 +5,7 @@ import ExportControl from './controls/ExportControl.jsx';
 import FedControl from './controls/FedControl.jsx';
 import FilterControl from './controls/FilterControl.jsx';
 import LayoutControl from './controls/LayoutControl.jsx';
+import SourceControl from './controls/SourceControl.jsx';
 import ZoomControl from './controls/ZoomControl.jsx';
 import Graph from './Graph.jsx';
 import GraphSource from './GraphSource.jsx';
@@ -15,11 +16,6 @@ const App = () => {
         fed: null,
         source: 'entityTypes',
         selection: [],
-        // sourceRefresh: {
-        //     busy: false,
-        //     source: '',
-        //     ts: 0,
-        // },
 
         graphData: {
             source: '',
@@ -46,8 +42,8 @@ const App = () => {
             <Graph />
             
             <ControlsContainer position={'top-left'}>
-                {/* <SourceControl /> */}
                 <FedControl />
+                <SourceControl />
                 <FilterControl />
                 <ExportControl />
             </ControlsContainer>

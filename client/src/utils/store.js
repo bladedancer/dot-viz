@@ -33,7 +33,9 @@ const processFile = async (storeEntry) => {
         );
 
         obj.entityStoreData.entity.forEach((e) =>
-            store.entities.push(processEntity(e))
+            store.entities.push(processEntity(
+                obj.entityStoreData.entityType.find(et => et.attributes.name === e.attributes.type),
+                e))
         );
     }
 
@@ -89,8 +91,16 @@ const processEntityType = (entityType) => {
     return type;
 };
 
-const processEntity = (entity) => {
-    // TODO process the entities
+const processEntity = (entityType, entity) => {
+    const entityData = {
+        id: entity.attributes.entityPK,
+        parent: entity.attributes.parentPK,
+        type: entity.attributes.type,
+        fields: Array.isArray(entity.fval) ? entity.fval : [entity.fval],
+        raw: entity,
+    };
+
+    return entityData;
 };
 
 const process = async (file) => {

@@ -45,6 +45,16 @@ export function useSetSelection() {
     };
 }
 
+export function useSetSource() {
+    const { settings, setSettings } = useSettingsContext();
+    const get = useCallback(() => settings.source, [settings]);
+
+    return {
+        source: get,
+        setSource: (source) => setSettings({...settings, source})
+    };
+}
+
 // export function useSetContentModifiedTS() {
 //     const { settings, setSettings } = useSettingsContext();
 //     const get = useCallback(() => settings.contentModifiedTS, [settings]);

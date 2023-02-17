@@ -1,0 +1,10 @@
+.source-control {
+    width: 260px;
+    display: flex;
+    padding: 10px 5px 5px 5px;
+}
+
+.source-toggle {
+    width: 200px;
+}
+
