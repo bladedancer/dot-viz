@@ -15,7 +15,5 @@ jobs:
           # checkout full tree
           fetch-depth: 0
       - name: Push to GH pages
-        env:
-          token: ${{ secrets.TOKEN }}
         run: |
           git push origin `git subtree split --prefix client/dist master`:gh-pages --force
