@@ -7,7 +7,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon --ignore 'store/*' --ignore 'client/*' src/index.js",
-    "react-dev": "webpack --watch"
+    "react-dev": "webpack --watch",
+    "build": "webpack"
   },
   "author": "",
   "license": "ISC",
