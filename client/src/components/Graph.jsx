@@ -22,7 +22,7 @@ const Graph = ({ children }) => {
                     id: n.id,
                     label: n.name,
                     color: n.color,
-                    root: !n.extends,
+                    root: !n.isRoot,
                 },
                 classes: `${n.isRoot ? 'root-node ' : ''}`,
             });
