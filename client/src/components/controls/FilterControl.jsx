@@ -77,7 +77,7 @@ const FilterControl = () => {
                                         e.data('isHard') &&
                                         ef.referenceHard) ||
                                     (linkType == 'reference' &&
-                                        e.data('isSoft') &&
+                                        !e.data('isHard') &&
                                         ef.referenceSoft)
                                 ) {
                                     // Along an enabled edge
