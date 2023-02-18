@@ -13,7 +13,6 @@ const Graph = ({ children }) => {
     // Convert to elements
     useEffect(() => {
         const nodeData = settings.nodeData[settings.source];
-        console.log(nodeData);
 
         let els = [];
         nodeData.forEach((n) => {
@@ -31,8 +30,10 @@ const Graph = ({ children }) => {
             n.links.forEach((l) => {
                 const targetNode = nodeData.find((tn) => tn.id === l.target);
                 if (!targetNode) {
-                    console.log('Link not found', l);
-                    return; // TODO: Presumably only target
+                    if (targetNode !== 'Entity') {
+                        console.error('Link not found', l);
+                    }
+                    return;
                 }
                 els.push({
                     data: {
@@ -43,6 +44,7 @@ const Graph = ({ children }) => {
                         targetColor: targetNode.color,
                         gradient: `${n.color} ${targetNode.color}`,
                         linkType: l.linkType,
+                        isHard: l.isHard
                     },
                 });
             });

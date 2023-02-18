@@ -70,7 +70,6 @@ const FilterControl = () => {
                             goal,
                             weight: (e) => {
                                 let linkType = e.data('linkType');
-                                // TODO: DIRECTION
                                 if (
                                     (linkType == 'extends' && ef.extends) ||
                                     (linkType == 'component' && ef.component) ||
@@ -104,8 +103,11 @@ const FilterControl = () => {
                     ef.component ? e.show() : e.hide();
                 } else if (linkType == 'reference') {
                     const isHard = e.data('isHard');
-                    isHard && ef.referenceHard ? e.show() : e.hide();
-                    !isHard && ef.referenceSoft ? e.show() : e.hide();
+                    if (isHard) {
+                        ef.referenceHard ? e.show() : e.hide();
+                    } else {
+                        ef.referenceSoft ? e.show() : e.hide();
+                    }
                 }
             });
         });
