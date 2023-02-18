@@ -136,14 +136,96 @@ function linkEntityParent(n) {
     ];
 }
 
+function linkEntityReferences(e, allEntities) {
+    if (!e.references) {
+        return [];
+    }
+
+    const links = [];
+
+    Object.keys(e.references).forEach((r) => {
+        const reference = e.references[r];
+        const fval = (
+            Array.isArray(e.raw.fval) ? e.raw.fval : [e.raw.fval]
+        ).find((f) => f.attributes.name === r);
+
+        if (!fval || !fval.value) {
+            return;
+        }
+
+        // Get an entity by it's parent, it's type, a field and value match
+        const getEntityByField = (parent, type, field, value) => {
+            const found = allEntities
+                .filter((e) => e.parent === parent && e.type === type)
+                .find((e) => {
+                    const fvals = Array.isArray(e.raw.fval)
+                        ? e.raw.fval
+                        : [e.raw.fval];
+                    return !!fvals.find(
+                        (f) => f.attributes.name === field && f.value === value
+                    );
+                });
+            return found ? found.id : '-1';
+        };
+
+        let targetIds = [];
+
+        if (fval.value['#text']) {
+            targetIds.push('' + fval.value['#text']);
+        } else {
+            const values = Array.isArray(fval.value)
+                ? fval.value
+                : [fval.value];
+
+            values.forEach((value) => {
+                let id = '0';
+                for (let key = value.key; !!key; key = key.key) {
+                    if(Array.isArray(key.id)) {
+                        console.error("Too lazy to figure out how to handle an array of ids.", key);
+                        continue;
+                    }
+
+                    id = getEntityByField(
+                        id,
+                        key.attributes.type,
+                        key.id.attributes.field,
+                        key.id.attributes.value
+                    );
+                }
+                if (id !== '-1') {
+                    targetIds.push(id);
+                }
+            });
+        }
+
+        targetIds.forEach((targetId) =>
+            links.push({
+                source: e.id,
+                target: targetId,
+                linkType: LINK_TYPE_REFERENCE,
+                isHard: reference.isHard,
+                size: 1,
+                type: 'arrow',
+                color: chroma(e.color).alpha(0.5).hex(),
+                weight: 5,
+                cardinality: reference.cardinality,
+            })
+        );
+    });
+    return links;
+}
+
 function nodifyEntities(fed) {
     let nodes = [];
-    let allEntities = {};
 
     const name = (e) => {
-        const nameField = e.fields.find((f) => (f.attributes.name === 'name'));
-        return nameField ? `${('' + nameField.value).substring(0, 20)} (${e.type})` : e.type;
+        const nameField = e.fields.find((f) => f.attributes.name === 'name');
+        return nameField
+            ? `${('' + nameField.value).substring(0, 20)} (${e.type})`
+            : e.type;
     };
+
+    const allEntities = fed.flatMap((f) => f.entities);
 
     for (let i = 0; i < fed.length; i++) {
         if (!fed[i].entities.length) {
@@ -161,7 +243,9 @@ function nodifyEntities(fed) {
                         name: name(entity),
                         parent: entity.parent,
                         isRoot: !entity.parent,
+                        type: entity.type,
                         raw: entity.raw,
+                        references: entity.references,
                         links: [],
                         color: color(i, fed.length),
                     };
@@ -174,17 +258,15 @@ function nodifyEntities(fed) {
         n.links = [
             ...n.links,
             ...linkEntityParent(n),
-            // ...linkReferences(n),
+            ...linkEntityReferences(n, allEntities),
         ];
     });
 
-    console.log(nodes);
     return { nodes };
 }
 
 const GraphSource = ({ children }) => {
     const { settings } = useSettingsContext();
-    const { fed, setFed } = useSetFed();
     const { setGraphData } = useSetGraphData();
 
     useEffect(async () => {

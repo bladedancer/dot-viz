@@ -16,6 +16,7 @@ const processFile = async (storeEntry) => {
         ignoreAttributes: false,
         attributeNamePrefix: '',
         attributesGroupName: 'attributes',
+        cdataPropName: '__cdata',
     };
     const parser = new XMLParser(options);
 
@@ -92,11 +93,27 @@ const processEntityType = (entityType) => {
 };
 
 const processEntity = (entityType, entity) => {
+    let references = {};
+
+    if (entityType.field) {
+        const typeFields = Array.isArray(entityType.field) ? entityType.field : [entityType.field];
+        const referenceFields = typeFields.filter(f => f.attributes.type.startsWith('^') || f.attributes.type.startsWith('@')); 
+        references = referenceFields.reduce((acc, cur) => {
+            acc[cur.attributes.name] = {
+                isHard: cur.attributes.type.startsWith('@'),
+                type: cur.attributes.type.substring(1),
+                cardinality: cur.attributes.cardinality || '*', // Not sure * is the default
+            };
+            return acc;
+        }, references);
+    }
+
     const entityData = {
         id: entity.attributes.entityPK,
         parent: entity.attributes.parentPK,
         type: entity.attributes.type,
         fields: Array.isArray(entity.fval) ? entity.fval : [entity.fval],
+        references,
         raw: entity,
     };
 

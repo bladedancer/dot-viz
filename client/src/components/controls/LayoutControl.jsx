@@ -1612,7 +1612,6 @@ const LayoutControl = ({ className, style, children }) => {
 
     // When the overrides change rerun layout
     useEffect(async () => {
-        console.log('effect', isMounted.current);
         if (isMounted.current) {
             runLayout();
         } else {
