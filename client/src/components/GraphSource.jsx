@@ -198,7 +198,7 @@ function linkEntityReferences(e, allEntities) {
             });
         }
 
-        targetIds.forEach((targetId) =>
+        targetIds.filter(tid => tid !== "-1").forEach((targetId) =>
             links.push({
                 source: e.id,
                 target: targetId,

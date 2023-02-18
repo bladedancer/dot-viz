@@ -9,6 +9,10 @@ import Toggle from '../utils/Toggle.jsx';
 import SlideToggle from '../utils/SlideToggle.jsx';
 import './filtercontrol.css';
 
+function escapeRegex(string) {
+    return string.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&');
+}
+
 const FilterControl = () => {
     const cy = useCy();
     const { source } = useSetSource();
@@ -32,7 +36,7 @@ const FilterControl = () => {
                     n
                         .data('label')
                         .toLowerCase()
-                        .match(nf.filter.toLowerCase() + '.*')
+                        .match(escapeRegex(nf.filter.toLowerCase()) + '.*')
                 ) {
                     n.show();
                 } else {

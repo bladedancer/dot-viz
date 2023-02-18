@@ -1,8 +1,14 @@
-import { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import {
+    createContext,
+    useContext,
+    useEffect,
+    useState,
+    useCallback,
+} from 'react';
 
 export const SettingsContext = createContext({
     settings: {},
-    setSettings: () => {}
+    setSettings: () => {},
 });
 
 export const SettingsProvider = SettingsContext.Provider;
@@ -10,7 +16,9 @@ export const SettingsProvider = SettingsContext.Provider;
 export function useSettingsContext() {
     const context = useContext(SettingsContext);
     if (context == null) {
-        throw new Error("No context provided: useSettingsContext() can only be used in a descendant of <GraphContainer>");
+        throw new Error(
+            'No context provided: useSettingsContext() can only be used in a descendant of <GraphContainer>'
+        );
     }
     return context;
 }
@@ -21,7 +29,7 @@ export function useSetFed() {
 
     return {
         fed: getFed,
-        setFed: (fed) => setSettings({...settings, fed, selection: []})
+        setFed: (fed) => setSettings({ ...settings, fed, selection: [] }),
     };
 }
 
@@ -31,7 +39,8 @@ export function useSetGraphData() {
 
     return {
         graphData: getGraphData,
-        setGraphData: (graphData) => setSettings({...settings, graphData, selection: []})
+        setGraphData: (graphData) =>
+            setSettings({ ...settings, graphData, selection: [] }),
     };
 }
 
@@ -41,7 +50,7 @@ export function useSetSelection() {
 
     return {
         selection: get,
-        setSelection: (selection) => setSettings({...settings, selection})
+        setSelection: (selection) => setSettings({ ...settings, selection }),
     };
 }
 
@@ -51,7 +60,7 @@ export function useSetSource() {
 
     return {
         source: get,
-        setSource: (source) => setSettings({...settings, source})
+        setSource: (source) => setSettings({ ...settings, source }),
     };
 }
 
@@ -81,7 +90,6 @@ export function useSetSource() {
 //     };
 // }
 
-
 // export function useSetSource() {
 //     const { settings, setSettings } = useSettingsContext();
 //     const getSource = useCallback(() => settings.source, [settings]);
@@ -98,13 +106,14 @@ export function useSetNodeFilter() {
 
     return {
         nodeFilter: getNodeFilter,
-        setNodeFilter: (nodeFilter) => setSettings({
-            ...settings,
-            nodes: {
-                ...settings.nodes,
-                ...nodeFilter
-            }
-        })
+        setNodeFilter: (nodeFilter) =>
+            setSettings({
+                ...settings,
+                nodes: {
+                    ...settings.nodes,
+                    ...nodeFilter,
+                },
+            }),
     };
 }
 
@@ -114,12 +123,13 @@ export function useSetEdgeFilter() {
 
     return {
         edgeFilter: getEdgeFilter,
-        setEdgeFilter: (edgeFilter) => setSettings({
-            ...settings,
-            edges: {
-                ...settings.edges,
-                ...edgeFilter
-            }
-        })
+        setEdgeFilter: (edgeFilter) =>
+            setSettings({
+                ...settings,
+                edges: {
+                    ...settings.edges,
+                    ...edgeFilter,
+                },
+            }),
     };
 }
