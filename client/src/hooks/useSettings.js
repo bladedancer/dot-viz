@@ -23,6 +23,17 @@ export function useSettingsContext() {
     return context;
 }
 
+export function useSetNodeData() {
+    const { settings, setSettings } = useSettingsContext();
+    return {
+        setNodeData: (nodeData) => setSettings({ ...settings, nodeData, selection: [] }),
+    };
+}
+
+
+// TODO: CLEAN UP GETTER USAGE - EASIER TO JUST ACCESS SETTINGS
+
+
 export function useSetFed() {
     const { settings, setSettings } = useSettingsContext();
     const getFed = useCallback(() => settings.fed, [settings]);

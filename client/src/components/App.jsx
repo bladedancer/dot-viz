@@ -8,7 +8,6 @@ import LayoutControl from './controls/LayoutControl.jsx';
 import SourceControl from './controls/SourceControl.jsx';
 import ZoomControl from './controls/ZoomControl.jsx';
 import Graph from './Graph.jsx';
-import GraphSource from './GraphSource.jsx';
 
 const App = () => {
     const [settings, setSettings] = useState({
@@ -20,6 +19,11 @@ const App = () => {
         graphData: {
             source: '',
             nodes: []
+        },
+
+        nodeData: {
+            entityTypes: [],
+            entities: [],
         },
 
         nodes: {
@@ -38,7 +42,6 @@ const App = () => {
 
     return (
         <SettingsProvider value={context}>
-            <GraphSource />
             <Graph />
             
             <ControlsContainer position={'top-left'}>

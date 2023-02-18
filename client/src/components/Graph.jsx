@@ -13,10 +13,11 @@ const Graph = ({children}) => {
 
     // Convert to elements
     useEffect(() => {
-        const nodeData = graphData();
+        const nodeData = settings.nodeData[settings.source];
+        console.log(nodeData);
         
         let els = [];
-        nodeData.nodes.forEach(n => {
+        nodeData.forEach(n => {
             els.push({
                 data: {
                     id: n.id,
@@ -27,9 +28,9 @@ const Graph = ({children}) => {
                 classes: `${n.isRoot ? 'root-node ' : ''}`
             });
         });
-        nodeData.nodes.forEach(n => {
+        nodeData.forEach(n => {
             n.links.forEach(l => {
-                const targetNode = nodeData.nodes.find(tn => tn.id === l.target);
+                const targetNode = nodeData.find(tn => tn.id === l.target);
                 if (!targetNode) {
                     console.log("Link not found", l)
                     return; // TODO: Presumably only target
@@ -48,7 +49,7 @@ const Graph = ({children}) => {
             });
         });
         setElements(els);
-    }, [settings.graphData]);
+    }, [settings.source, settings.nodeData]);
 
     // useLayoutEffect(() => {
     //     setContentModifiedTS(Date.now());
