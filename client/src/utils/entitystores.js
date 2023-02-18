@@ -34,7 +34,9 @@ function linkComponents(entityType, col) {
         return [];
     }
 
-    const componentTypes = Array.isArray(entityType.componentType) ? entityType.componentType : [entityType.componentType];
+    const componentTypes = Array.isArray(entityType.componentType)
+        ? entityType.componentType
+        : [entityType.componentType];
 
     return componentTypes.map((c) => ({
         source: entityType.attributes.name,
@@ -72,8 +74,13 @@ function linkReferences(entityType, col) {
         return [];
     }
 
-    const fields = (Array.isArray(entityType.field) ? entityType.field : [entityType.field])
-        .filter(f => f.attributes.type.startsWith('@') || f.attributes.type.startsWith('^'));
+    const fields = (
+        Array.isArray(entityType.field) ? entityType.field : [entityType.field]
+    ).filter(
+        (f) =>
+            f.attributes.type.startsWith('@') ||
+            f.attributes.type.startsWith('^')
+    );
 
     return fields.map((r) => ({
         source: entityType.attributes.name,
@@ -88,6 +95,110 @@ function linkReferences(entityType, col) {
     }));
 }
 
+function linkEntityReferences(entity, col, allEntities, allEntityTypes) {
+    // For the entire inheritance tree get the list of reference fields.
+    let tree = [];
+    for (
+        let type = allEntityTypes[entity.attributes.type];
+        type;
+        type = allEntityTypes[type.attributes.extends]
+    ) {
+        tree.push(type);
+    }
+
+    let referenceFields = [];
+
+    tree.forEach((entityType) => {
+        if (!entityType.field) {
+            return;
+        }
+        const fields = (
+            Array.isArray(entityType.field)
+                ? entityType.field
+                : [entityType.field]
+        )
+            .filter(
+                (f) =>
+                    f.attributes.type.startsWith('@') ||
+                    f.attributes.type.startsWith('^')
+            )
+            .map((f) => ({
+                name: f.attributes.name,
+                isHard: f.attributes.type.startsWith('@'),
+                cardinality: f.attributes.cardinality,
+                type: f.attributes.name,
+            }));
+        referenceFields = [...referenceFields, ...fields];
+    });
+
+    // Get an entity by it's parent, it's type, a field and value match
+    const getEntityByField = (parent, type, field, value) => {
+        const found = allEntities
+            .filter((e) => e.parent === parent && e.type === type)
+            .find((e) => {
+                const fvals = Array.isArray(e.raw.fval)
+                    ? e.raw.fval
+                    : [e.raw.fval];
+                return !!fvals.find(
+                    (f) => f.attributes.name === field && f.value === value
+                );
+            });
+        return found ? found.id : '-1';
+    };
+
+    // Get all the reference field values in the entity and create links
+    let targetIds = [];
+    const fvals = Array.isArray(entity.fval) ? entity.fval : [entity.fval];
+    referenceFields.forEach((f) => {
+        const fval = fvals.find((fval) => fval.attributes.name === f.name);
+
+        if (!fval || !fval.value) {
+            return;
+        } else if (fval.value['#text']) {
+            let id = '' + fval.value['#text'];
+            id != '-1' && targetIds.push({ id, isHard: f.isHard });
+        } else {
+            const values = Array.isArray(fval.value)
+                ? fval.value
+                : [fval.value];
+
+            values.forEach((value) => {
+                let id = '-1';
+                for (let key = value.key; !!key; key = key.key) {
+                    if (Array.isArray(key.id)) {
+                        console.error(
+                            'Too lazy to figure out how to handle an array of ids.',
+                            key
+                        );
+                        continue;
+                    }
+
+                    id = getEntityByField(
+                        id,
+                        key.attributes.type,
+                        key.id.attributes.field,
+                        key.id.attributes.value
+                    );
+                }
+                if (id !== '-1') {
+                    targetIds.push({ id, isHard: f.isHard });
+                }
+            });
+        }
+    });
+
+    return targetIds.map((target) => ({
+        source: entity.attributes.entityPK,
+        target: target.id,
+        linkType: LINK_TYPE_REFERENCE,
+        isHard: target.isHard,
+        size: 1,
+        type: 'arrow',
+        color: chroma(col).alpha(0.5).hex(),
+        weight: 5,
+        cardinality: '1',
+    }));
+}
 
 const nodifyEntityType = (entityType, store, stores) => {
     const node = {
@@ -103,22 +214,34 @@ const nodifyEntityType = (entityType, store, stores) => {
     node.links = [
         ...linkExtends(entityType, node.color),
         ...linkComponents(entityType, node.color),
-        ...linkReferences(entityType, node.color)
-    ]
+        ...linkReferences(entityType, node.color),
+    ];
 
     return node;
 };
 
 const nodifyEntity = (entity, store, stores) => {
+    const allEntityTypes = stores
+        .map((s) => s.entityTypes)
+        .flatMap((e) => e)
+        .reduce((acc, cur) => {
+            acc[cur.attributes.name] = cur;
+            return acc;
+        }, {});
+
+    const allEntities = stores.map((s) => s.entities).flatMap((e) => e);
+
     let fvals = [];
     if (entity.fval) {
-        fvals = (Array.isArray(entity.fval) ? entity.fval : [entity.fval]);
+        fvals = Array.isArray(entity.fval) ? entity.fval : [entity.fval];
     }
 
     const name = (e) => {
         const nameField = fvals.find((f) => f.attributes.name === 'name');
         return nameField
-            ? `${('' + nameField.value).substring(0, 20)} (${e.attributes.type})`
+            ? `${('' + nameField.value).substring(0, 20)} (${
+                  e.attributes.type
+              })`
             : e.attributes.type;
     };
 
@@ -134,14 +257,11 @@ const nodifyEntity = (entity, store, stores) => {
 
     node.links = [
         ...node.links,
-        ...linkEntityParent(entity, node.color)
-        // n.links = [
-        //     ...n.links,
-        //     ...linkEntityParent(n),
-        //     ...linkEntityReferences(n, allEntities),
-        ];
+        ...linkEntityParent(entity, node.color),
+        ...linkEntityReferences(entity, node.color, allEntities, allEntityTypes),
+    ];
     return node;
-}
+};
 
 const nodify = async (stores) => {
     let entityTypeNodes = [];
@@ -157,7 +277,6 @@ const nodify = async (stores) => {
             ...entityNodes,
             store.entities.map((e) => nodifyEntity(e, store, stores)),
         ];
-
     });
 
     entityTypeNodes = entityTypeNodes.flatMap((f) => f);
@@ -165,7 +284,7 @@ const nodify = async (stores) => {
 
     return {
         entityTypes: entityTypeNodes,
-        entities: entityNodes
+        entities: entityNodes,
     };
 };
 
