@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 
 import { FiZoomIn, FiZoomOut, FiCrosshair, FiMaximize } from 'react-icons/fi';
 import { useCy } from '../../hooks/useCy';
-import { useSetSelection } from '../../hooks/useSettings.js';
+import { useSettingsContext } from '../../hooks/useSettings.js';
 
 /**
  * The `ZoomControl` create three UI buttons that allows the user to
@@ -11,18 +11,18 @@ import { useSetSelection } from '../../hooks/useSettings.js';
  * - reset zoom (ie. see the whole graph)
  *
  * ```jsx
- * <GraphContainer>
+ * <App>
  *   <ControlsContainer>
  *     <ZoomControl />
  *   </ControlsContainer>
- * </GraphContainer>
+ * </App>
  * ```
  *
  * @category Component
  */
 const ZoomControl = ({ className, style, duration, children }) => {
     const cy = useCy();
-    const { selection } = useSetSelection();
+    const { settings } = useSettingsContext();
 
     duration = duration || 200;
 
@@ -116,7 +116,7 @@ const ZoomControl = ({ className, style, duration, children }) => {
                 <button
                     onClick={fitsel}
                     title="Zoom to selection"
-                    disabled={selection().length === 0}
+                    disabled={settings.selection.length === 0}
                 >
                     {children ? (
                         children[3]

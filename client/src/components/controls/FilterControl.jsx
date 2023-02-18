@@ -4,6 +4,7 @@ import {
     useSetNodeFilter,
     useSetEdgeFilter,
     useSetSource,
+    useSettingsContext,
 } from '../../hooks/useSettings.js';
 import Toggle from '../utils/Toggle.jsx';
 import SlideToggle from '../utils/SlideToggle.jsx';
@@ -15,17 +16,17 @@ function escapeRegex(string) {
 
 const FilterControl = () => {
     const cy = useCy();
-    const { source } = useSetSource();
-    const { nodeFilter, setNodeFilter } = useSetNodeFilter();
-    const { edgeFilter, setEdgeFilter } = useSetEdgeFilter();
+    const { settings } = useSettingsContext();
+    const { setNodeFilter } = useSetNodeFilter();
+    const { setEdgeFilter } = useSetEdgeFilter();
 
     useEffect(async () => {
         if (!cy) {
             return;
         }
         cy.batch(() => {
-            let nf = nodeFilter();
-            let ef = edgeFilter();
+            let nf = settings.nodeFilter;
+            let ef = settings.edgeFilter;
 
             cy.nodes().forEach((n) => {
                 // Ids take precedence
@@ -108,7 +109,7 @@ const FilterControl = () => {
                 }
             });
         });
-    }, [cy, nodeFilter(), edgeFilter()]);
+    }, [cy, settings.nodeFilter, settings.edgeFilter]);
 
     return (
         <>
@@ -120,36 +121,36 @@ const FilterControl = () => {
                             type="text"
                             name="filter"
                             placeholder="Filter displayed resources"
-                            value={nodeFilter().filter}
+                            value={settings.nodeFilter.filter}
                             onChange={(e) =>
                                 setNodeFilter({
                                     filter: e.target.value,
                                     connected: false,
-                                    direction: nodeFilter().direction,
+                                    direction: settings.nodeFilter.direction,
                                 })
                             } // Need to debounce this
                         />
                     </label>
                 </div>
                 <Toggle
-                    checked={nodeFilter().connected}
+                    checked={settings.nodeFilter.connected}
                     onChange={() =>
                         setNodeFilter({
-                            connected: !nodeFilter().connected,
-                            direction: nodeFilter().direction,
+                            connected: !settings.nodeFilter.connected,
+                            direction: settings.nodeFilter.direction,
                         })
                     }
                 >
                     Connected Nodes
                 </Toggle>
-                {nodeFilter().connected && (
+                {settings.nodeFilter.connected && (
                     <SlideToggle
                         className="connected-toggle"
-                        selected={nodeFilter().direction}
+                        selected={settings.nodeFilter.direction}
                         onChange={(e) =>
                             setNodeFilter({
-                                filter: nodeFilter().filter,
-                                connected: nodeFilter().connected,
+                                filter: settings.nodeFilter.filter,
+                                connected: settings.nodeFilter.connected,
                                 direction: e,
                             })
                         }
@@ -170,12 +171,12 @@ const FilterControl = () => {
                     />
                 )}
                 <div className="edge-filter-control">
-                    {source() === 'entityTypes' && (
+                    {settings.source === 'entityTypes' && (
                         <Toggle
-                            checked={edgeFilter().extends}
+                            checked={settings.edgeFilter.extends}
                             onChange={() =>
                                 setEdgeFilter({
-                                    extends: !edgeFilter().extends,
+                                    extends: !settings.edgeFilter.extends,
                                 })
                             }
                         >
@@ -183,30 +184,30 @@ const FilterControl = () => {
                         </Toggle>
                     )}
                     <Toggle
-                        checked={edgeFilter().component}
+                        checked={settings.edgeFilter.component}
                         onChange={() =>
                             setEdgeFilter({
-                                component: !edgeFilter().component,
+                                component: !settings.edgeFilter.component,
                             })
                         }
                     >
                         Component
                     </Toggle>
                     <Toggle
-                        checked={edgeFilter().referenceHard}
+                        checked={settings.edgeFilter.referenceHard}
                         onChange={() =>
                             setEdgeFilter({
-                                referenceHard: !edgeFilter().referenceHard,
+                                referenceHard: !settings.edgeFilter.referenceHard,
                             })
                         }
                     >
                         Hard Reference
                     </Toggle>
                     <Toggle
-                        checked={edgeFilter().referenceSoft}
+                        checked={settings.edgeFilter.referenceSoft}
                         onChange={() =>
                             setEdgeFilter({
-                                referenceSoft: !edgeFilter().referenceSoft,
+                                referenceSoft: !settings.edgeFilter.referenceSoft,
                             })
                         }
                     >

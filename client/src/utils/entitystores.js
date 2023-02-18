@@ -258,7 +258,12 @@ const nodifyEntity = (entity, store, stores) => {
     node.links = [
         ...node.links,
         ...linkEntityParent(entity, node.color),
-        ...linkEntityReferences(entity, node.color, allEntities, allEntityTypes),
+        ...linkEntityReferences(
+            entity,
+            node.color,
+            allEntities,
+            allEntityTypes
+        ),
     ];
     return node;
 };

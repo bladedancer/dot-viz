@@ -1,16 +1,17 @@
 import React from 'react';
-import { useSetSource  } from '../../hooks/useSettings.js';
+import { useSetSource, useSettingsContext  } from '../../hooks/useSettings.js';
 import SlideToggle from '../utils/SlideToggle.jsx';
 import './sourcecontrol.css';
 
 const SourceControl = () => {
-    const { source, setSource } = useSetSource();
+    const { settings } = useSettingsContext();
+    const { setSource } = useSetSource();
     return (
         <>
             <div className="react-cy-control source-control">
                 <SlideToggle
                     className="source-toggle"
-                    selected={source()}
+                    selected={settings.source}
                     onChange={setSource}
                     options={[
                         {

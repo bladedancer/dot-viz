@@ -26,102 +26,19 @@ export function useSettingsContext() {
 export function useSetNodeData() {
     const { settings, setSettings } = useSettingsContext();
     return {
-        setNodeData: (nodeData) => setSettings({ ...settings, nodeData, selection: [] }),
+        setNodeData: (nodeData) =>
+            setSettings({ ...settings, nodeData, selection: [] }),
     };
 }
-
-
-// TODO: CLEAN UP GETTER USAGE - EASIER TO JUST ACCESS SETTINGS
-
-
-export function useSetFed() {
-    const { settings, setSettings } = useSettingsContext();
-    const getFed = useCallback(() => settings.fed, [settings]);
-
-    return {
-        fed: getFed,
-        setFed: (fed) => setSettings({ ...settings, fed, selection: [] }),
-    };
-}
-
-export function useSetGraphData() {
-    const { settings, setSettings } = useSettingsContext();
-    const getGraphData = useCallback(() => settings.graphData, [settings]);
-
-    return {
-        graphData: getGraphData,
-        setGraphData: (graphData) =>
-            setSettings({ ...settings, graphData, selection: [] }),
-    };
-}
-
-export function useSetSelection() {
-    const { settings, setSettings } = useSettingsContext();
-    const get = useCallback(() => settings.selection, [settings]);
-
-    return {
-        selection: get,
-        setSelection: (selection) => setSettings({ ...settings, selection }),
-    };
-}
-
-export function useSetSource() {
-    const { settings, setSettings } = useSettingsContext();
-    const get = useCallback(() => settings.source, [settings]);
-
-    return {
-        source: get,
-        setSource: (source) => setSettings({ ...settings, source }),
-    };
-}
-
-// export function useSetContentModifiedTS() {
-//     const { settings, setSettings } = useSettingsContext();
-//     const get = useCallback(() => settings.contentModifiedTS, [settings]);
-
-//     return {
-//         contentModifiedTS: get,
-//         setContentModifiedTS: (contentModifiedTS) => setSettings({...settings, contentModifiedTS})
-//     };
-// }
-
-// export function useSetSourceRefresh() {
-//     const { settings, setSettings } = useSettingsContext();
-//     const get = useCallback(() => settings.sourceRefresh, [settings]);
-
-//     return {
-//         sourceRefresh: get,
-//         setSourceRefresh: (sourceRefresh) => setSettings({...settings, sourceRefresh: { ...sourceRefresh, busy: true, ts: Date.now() }}),
-//         setSourceRefreshBusy: (busy) => setSettings({
-//             ...settings,
-//             sourceRefresh: {
-//                 ...settings.sourceRefresh,
-//                 busy
-//             }}),
-//     };
-// }
-
-// export function useSetSource() {
-//     const { settings, setSettings } = useSettingsContext();
-//     const getSource = useCallback(() => settings.source, [settings]);
-
-//     return {
-//         source: getSource,
-//         setSource: (source) => setSettings({...settings, source, selection: []})
-//     };
-// }
 
 export function useSetNodeFilter() {
     const { settings, setSettings } = useSettingsContext();
-    const getNodeFilter = useCallback(() => settings.nodes, [settings]);
-
     return {
-        nodeFilter: getNodeFilter,
         setNodeFilter: (nodeFilter) =>
             setSettings({
                 ...settings,
-                nodes: {
-                    ...settings.nodes,
+                nodeFilter: {
+                    ...settings.nodeFilter,
                     ...nodeFilter,
                 },
             }),
@@ -130,17 +47,28 @@ export function useSetNodeFilter() {
 
 export function useSetEdgeFilter() {
     const { settings, setSettings } = useSettingsContext();
-    const getEdgeFilter = useCallback(() => settings.edges, [settings]);
-
     return {
-        edgeFilter: getEdgeFilter,
         setEdgeFilter: (edgeFilter) =>
             setSettings({
                 ...settings,
-                edges: {
-                    ...settings.edges,
+                edgeFilter: {
+                    ...settings.edgeFilter,
                     ...edgeFilter,
                 },
             }),
+    };
+}
+
+export function useSetSelection() {
+    const { settings, setSettings } = useSettingsContext();
+    return {
+        setSelection: (selection) => setSettings({ ...settings, selection }),
+    };
+}
+
+export function useSetSource() {
+    const { settings, setSettings } = useSettingsContext();
+    return {
+        setSource: (source) => setSettings({ ...settings, source }),
     };
 }

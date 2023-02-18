@@ -16,22 +16,17 @@ const App = () => {
         source: 'entityTypes',
         selection: [],
 
-        graphData: {
-            source: '',
-            nodes: []
-        },
-
         nodeData: {
             entityTypes: [],
             entities: [],
         },
 
-        nodes: {
+        nodeFilter: {
             filter: '',
             connected: false,
             direction: 'both',
         },
-        edges: {
+        edgeFilter: {
             extends: true,
             component: true,
             referenceHard: true,
@@ -43,7 +38,7 @@ const App = () => {
     return (
         <SettingsProvider value={context}>
             <Graph />
-            
+
             <ControlsContainer position={'top-left'}>
                 <FedControl />
                 <SourceControl />
