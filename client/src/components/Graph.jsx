@@ -22,6 +22,8 @@ const Graph = ({ children }) => {
                     label: n.name,
                     color: n.color,
                     root: !n.isRoot,
+                    group: n.group,
+                    depth: n.depth,
                 },
                 classes: `${n.isRoot ? 'root-node ' : ''}`,
             });

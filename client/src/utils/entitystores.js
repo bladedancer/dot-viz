@@ -5,7 +5,6 @@ const LINK_TYPE_COMPONENT = 'component';
 const LINK_TYPE_REFERENCE = 'reference';
 
 function color(index, domain) {
-    console.log(index, domain);
     return chroma(chroma.scale('Spectral').colors(domain)[index])
         .darken()
         .hex();
@@ -213,7 +212,7 @@ const entityTypeHierachy = (stores) => {
     });
 
     // Build up a hierachy containing, children, parent, root.
-    const process = (entityType, parent, root, col) => {
+    const process = (entityType, parent, root, col, depth = 0) => {
         if (!col) {
             col = {};
         }
@@ -243,7 +242,7 @@ const entityTypeHierachy = (stores) => {
                 // Direct descendents of entity are roots.
                 col[entityType].children.forEach(c => process(c, entityType, null, col));
             } else {
-                col[entityType].children.forEach(c => process(c, entityType, isRoot ? entityType : root, col));
+                col[entityType].children.forEach(c => process(c, entityType, isRoot ? entityType : root, col, depth++));
             }
         }
         return col;
@@ -268,6 +267,7 @@ const nodifyEntityType = (entityType, hierachy) => {
         raw: entityType,
         links: [],
         color: color(hierachy[entityType.attributes.name].rootIndex, maxIndex),
+        depth: hierachy[entityType.attributes.name].depth
     };
 
     node.links = [
@@ -312,6 +312,7 @@ const nodifyEntity = (entity, store, stores) => {
         raw: entity,
         links: [],
         color: color(stores.indexOf(store), stores.length),
+        depth: 0 // TODO
     };
 
     node.links = [
