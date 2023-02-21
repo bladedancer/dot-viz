@@ -5,6 +5,7 @@ const LINK_TYPE_COMPONENT = 'component';
 const LINK_TYPE_REFERENCE = 'reference';
 
 function color(index, domain) {
+    console.log(index, domain);
     return chroma(chroma.scale('Spectral').colors(domain)[index])
         .darken()
         .hex();
@@ -200,15 +201,73 @@ function linkEntityReferences(entity, col, allEntities, allEntityTypes) {
     }));
 }
 
-const nodifyEntityType = (entityType, store, stores) => {
+const entityTypeHierachy = (stores) => {
+    let entityTypeRoots = [];
+    const children = {};
+    stores.forEach((store) => {
+        store.entityTypes.reduce((h, entityType) => {
+            h[entityType.attributes.extends] = h[entityType.attributes.extends] || [];
+            h[entityType.attributes.extends].push(entityType.attributes.name);
+            return h;
+        }, children);
+    });
+
+    // Build up a hierachy containing, children, parent, root.
+    const process = (entityType, parent, root, col) => {
+        if (!col) {
+            col = {};
+        }
+
+        col[entityType] = {
+            children: children[entityType],
+            parent: parent,
+            root
+        };
+
+        // Give nodes with a common root a common index.
+        const isRoot = !root;
+        col[entityType].rootIndex = 0;
+        if (isRoot) {
+            // Single nodes are just noise - just call them 0 and have done with it.
+            if (col[entityType].children) {
+                entityTypeRoots.push(entityType);
+                col[entityType].rootIndex = entityTypeRoots.length;
+            }
+        } else {
+            col[entityType].rootIndex = col[root].rootIndex;
+        }
+        
+        // Recursive
+        if (col[entityType].children) {
+            if (entityType === 'Entity' || entityType === 'RootChild') {
+                // Direct descendents of entity are roots.
+                col[entityType].children.forEach(c => process(c, entityType, null, col));
+            } else {
+                col[entityType].children.forEach(c => process(c, entityType, isRoot ? entityType : root, col));
+            }
+        }
+        return col;
+    }
+
+    return process("Entity");
+}
+
+const nodifyEntityType = (entityType, hierachy) => {
+    const maxIndex = Object.keys(hierachy).reduce((i, et) => {
+        if (hierachy[et].rootIndex > i) {
+            i = hierachy[et].rootIndex;
+        }
+        return i;
+    }, 0) + 1;
+
     const node = {
         id: entityType.attributes.name,
-        group: store.name,
+        group: hierachy[entityType.attributes.name].root || entityType.attributes.name,
         name: entityType.attributes.name,
-        isRoot: entityType.attributes.extends === 'Entity',
+        isRoot: !!hierachy[entityType.attributes.name].root,
         raw: entityType,
         links: [],
-        color: color(stores.indexOf(store), stores.length),
+        color: color(hierachy[entityType.attributes.name].rootIndex, maxIndex),
     };
 
     node.links = [
@@ -271,11 +330,12 @@ const nodifyEntity = (entity, store, stores) => {
 const nodify = async (stores) => {
     let entityTypeNodes = [];
     let entityNodes = [];
+    const hierachy = entityTypeHierachy(stores);
 
     stores.forEach((store) => {
         entityTypeNodes = [
             ...entityTypeNodes,
-            store.entityTypes.map((et) => nodifyEntityType(et, store, stores)),
+            store.entityTypes.map((et) => nodifyEntityType(et, hierachy)),
         ];
 
         entityNodes = [

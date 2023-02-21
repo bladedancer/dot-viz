@@ -262,29 +262,29 @@ const supportedLayouts = {
         edgeLength: (e) => {
             let length =
                 e.source().data('group') === e.target().data('group')
-                    ? supportedLayouts.cola.edgeLengthInStore || 100
-                    : supportedLayouts.cola.edgeLengthCrossStore || 300;
+                    ? supportedLayouts.cola.edgeLengthInGroup || 100
+                    : supportedLayouts.cola.edgeLengthCrossGroup || 300;
             return length;
         },
-
+        flow: false,
         animate: true, // whether to show the layout as it's running
         infinite: true,
         refresh: 1, // number of ticks per frame; higher is faster but more jerky
         maxSimulationTime: 4000, // max length in ms to run the layout
         ungrabifyWhileSimulating: false, // so you can't drag nodes during layout
-        edgeLengthInStore: 100,
-        edgeLengthCrossStore: 300,
+        edgeLengthInGroup: 100,
+        edgeLengthCrossGroup: 300,
         fit: false, // on every layout reposition of nodes, fit the viewport
         padding: 30, // padding around the simulation
         nodeDimensionsIncludeLabels: true, // whether labels should be included in determining the space used by a node
         randomize: false, // use random node positions at beginning of layout
-        avoidOverlap: true, // if true, prevents overlap of node bounding boxes
+        avoidOverlap: false, // if true, prevents overlap of node bounding boxes
         handleDisconnected: true, // if true, avoids disconnected components from overlapping
         convergenceThreshold: 0.01, // when the alpha value (system energy) falls below this value, the layout stops
         centerGraph: false, // adjusts the node positions initially to center the graph (pass false if you want to start the layout from the current position)
 
         schema: {
-            title: 'circle',
+            title: 'cola',
             type: 'object',
             properties: {
                 animate: {
@@ -295,7 +295,7 @@ const supportedLayouts = {
                 avoidOverlap: {
                     type: 'boolean',
                     title: 'Avoid Overlap',
-                    default: true,
+                    default: false,
                 },
                 centerGraph: {
                     type: 'boolean',
@@ -307,14 +307,14 @@ const supportedLayouts = {
                     title: 'Convergence Threshold',
                     default: 0.01,
                 },
-                edgeLengthCrossStore: {
+                edgeLengthCrossGroup: {
                     type: 'number',
-                    title: 'Edge Length Cross Store',
+                    title: 'Edge Length Cross Group',
                     default: 300,
                 },
-                edgeLengthInStore: {
+                edgeLengthInGroup: {
                     type: 'number',
-                    title: 'Edge Length In Store',
+                    title: 'Edge Length In Group',
                     default: 100,
                 },
                 fit: {
@@ -326,6 +326,11 @@ const supportedLayouts = {
                     type: 'boolean',
                     title: 'Handle Disconnected',
                     default: true,
+                },
+                flow: {
+                    type: 'object', 
+                    title: 'Flow (use default)',
+                    default: false
                 },
                 infinite: {
                     type: 'boolean',
@@ -502,12 +507,10 @@ const supportedLayouts = {
         //    ['n7', 'n8', 'n9', 'n10'] ]
         clusters: (n) => {
             switch (supportedLayouts.cise.clusterBy) {
-                case 'extends':
-                    return hash(n.data('extends'));
                 case 'group':
-                    return n.data('group');
+                    return hash(n.data('extends'));
                 default:
-                    return n.data('group');
+                    return hash(n.data('extends'));
             }
         },
 
@@ -521,7 +524,7 @@ const supportedLayouts = {
         // - 'end' : Animate directly to the end result
         animate: true,
 
-        // What grouping to use - scope, kind, group
+        // What grouping to use - group
         clusterBy: 'group',
 
         // Whether to fit the viewport to the repositioned graph
@@ -575,7 +578,7 @@ const supportedLayouts = {
                 clusterBy: {
                     type: 'string',
                     title: 'Cluster By',
-                    enum: ['extends', 'group'],
+                    enum: ['group'],
                     default: 'group',
                 },
                 fit: {
@@ -1283,7 +1286,7 @@ const supportedLayouts = {
         name: 'fcose',
         nodeDimensionsIncludeLabels: true,
         packComponents: false,
-        nodeRepulsion: (n) => (n.data('isRoot') ? 8000 : 4500),
+        nodeRepulsion: (n) => (n.data('root') ? 8000 : 4500),
         idealEdgeLength: (e) => {
             let type = e.data('linkType');
             if (type === 'extends') {
