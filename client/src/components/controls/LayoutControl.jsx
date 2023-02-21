@@ -1061,9 +1061,11 @@ const supportedLayouts = {
         // - The mass affects the gravity node repulsion/attraction
         mass: (node) => {
             if (node.data('root')) {
-                return supportedLayouts.euler.massScope || 40;
+                return supportedLayouts.euler.massRoot || 40;
             } else {
-                return supportedLayouts.euler.massResource || 4;
+                const depth = node.data('depth');
+
+                return (supportedLayouts.euler.massChild * (1/(depth || 1))) || 4;
             }
         },
 
@@ -1180,14 +1182,14 @@ const supportedLayouts = {
                     title: 'Gravity',
                     default: -1.2,
                 },
-                massScope: {
+                massRoot: {
                     type: 'number',
-                    title: 'Mass (Scope)',
+                    title: 'Mass (Root)',
                     default: 40,
                 },
-                massResource: {
+                massChild: {
                     type: 'number',
-                    title: 'Mass (Resource)',
+                    title: 'Mass (Child)',
                     default: 4,
                 },
                 maxIterations: {
