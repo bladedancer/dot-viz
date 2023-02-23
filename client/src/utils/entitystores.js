@@ -312,7 +312,7 @@ const nodifyEntity = (entity, store, stores) => {
         raw: entity,
         links: [],
         color: color(stores.indexOf(store), stores.length),
-        depth: 0 // TODO
+        depth: 1 // TODO...do entities have a depth??
     };
 
     node.links = [
