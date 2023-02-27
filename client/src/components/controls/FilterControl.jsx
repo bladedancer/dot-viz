@@ -30,17 +30,22 @@ const FilterControl = () => {
 
             cy.nodes().forEach((n) => {
                 // Ids take precedence
-                if (nf.ids && nf.ids.length && !nf.ids.includes(n.id())) {
-                    n.hide();
-                } else if (
-                    !nf.filter ||
-                    n
-                        .data('label')
-                        .toLowerCase()
-                        .match(escapeRegex(nf.filter.toLowerCase()) + '.*')
-                ) {
-                    n.show();
-                } else {
+                try {
+                    if (nf.ids && nf.ids.length && !nf.ids.includes(n.id())) {
+                        n.hide();
+                    } else if (
+                        !nf.filter ||
+                        n
+                            .data('label')
+                            .toLowerCase()
+                            .match(nf.filter.toLowerCase() + '.*')
+                    ) {
+                        n.show();
+                    } else {
+                        n.hide();
+                    }
+                } catch (err) {
+                    console.error(err);
                     n.hide();
                 }
             });

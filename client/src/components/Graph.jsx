@@ -42,6 +42,7 @@ const Graph = ({ children }) => {
                         id: `${l.linkType}-${l.source}-${l.target}`,
                         source: l.source,
                         target: l.target,
+                        label: l.label,
                         sourceColor: n.color,
                         targetColor: targetNode.color,
                         gradient: `${n.color} ${targetNode.color}`,

@@ -86,6 +86,7 @@ function linkReferences(entityType, col) {
         source: entityType.attributes.name,
         target: r.attributes.type.substring(1),
         linkType: LINK_TYPE_REFERENCE,
+        label: r.attributes.name,
         isHard: r.attributes.type.startsWith('@'),
         size: 1,
         type: 'arrow',
