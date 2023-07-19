@@ -28,6 +28,7 @@ const FilterControl = () => {
             let nf = settings.nodeFilter;
             let ef = settings.edgeFilter;
 
+            console.log("here");
             cy.nodes().forEach((n) => {
                 // Ids take precedence
                 try {
