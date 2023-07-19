@@ -1,7 +1,7 @@
 {
-  "name": "fed-viz",
+  "name": "dot-viz",
   "version": "1.0.0",
-  "description": "Federated Archive Visualization",
+  "description": "Dot Visualization With Physics",
   "type": "module",
   "main": "src/index.js",
   "scripts": {

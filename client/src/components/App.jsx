@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { SettingsProvider } from '../hooks/useSettings.js';
 import ControlsContainer from './controls/ControlsContainer.jsx';
 import ExportControl from './controls/ExportControl.jsx';
-import FedControl from './controls/FedControl.jsx';
+import DotControl from './controls/DotControl.jsx';
 import FilterControl from './controls/FilterControl.jsx';
 import LayoutControl from './controls/LayoutControl.jsx';
 import SourceControl from './controls/SourceControl.jsx';
@@ -13,12 +13,12 @@ const App = () => {
     const [settings, setSettings] = useState({
         contentModifiedTS: 0,
         fed: null,
-        source: 'entityTypes',
+        source: 'artifacts',
         selection: [],
 
         nodeData: {
-            entityTypes: [],
-            entities: [],
+            groups: [],
+            artifacts: [],
         },
 
         nodeFilter: {
@@ -27,10 +27,8 @@ const App = () => {
             direction: 'both',
         },
         edgeFilter: {
-            extends: true,
-            component: true,
-            referenceHard: true,
-            referenceSoft: true,
+            compile: true,
+            provided: true,
         },
     });
     const context = useMemo(() => ({ settings, setSettings }), [settings]);
@@ -40,7 +38,7 @@ const App = () => {
             <Graph />
 
             <ControlsContainer position={'top-left'}>
-                <FedControl />
+                <DotControl />
                 <SourceControl />
                 <FilterControl />
                 <ExportControl />

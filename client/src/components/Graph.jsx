@@ -8,7 +8,6 @@ const Graph = ({ children }) => {
     const { settings } = useSettingsContext();
     const { setSelection } = useSetSelection();
     const cy = useCy();
-    // const {contentModifiedTS, setContentModifiedTS} = useSetContentModifiedTS();
 
     // Convert to elements
     useEffect(() => {
@@ -32,9 +31,7 @@ const Graph = ({ children }) => {
             n.links.forEach((l) => {
                 const targetNode = nodeData.find((tn) => tn.id === l.target);
                 if (!targetNode) {
-                    if (targetNode !== 'Entity') {
-                        console.error('Link not found', l);
-                    }
+                    console.error('Link not found', l);
                     return;
                 }
                 els.push({
@@ -54,10 +51,6 @@ const Graph = ({ children }) => {
         });
         setElements(els);
     }, [settings.source, settings.nodeData]);
-
-    // useLayoutEffect(() => {
-    //     setContentModifiedTS(Date.now());
-    // }, [elements])
 
     const cytoscapeStylesheet = [
         {

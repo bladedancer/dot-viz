@@ -15,12 +15,12 @@ const SourceControl = () => {
                     onChange={setSource}
                     options={[
                         {
-                            value: 'entityTypes',
-                            label: 'Entity Types',
+                            value: 'groups',
+                            label: 'Groups',
                         },
                         {
-                            value: 'entities',
-                            label: 'Entities',
+                            value: 'artifacts',
+                            label: 'Artifacts',
                         },
                     ]}
                 />

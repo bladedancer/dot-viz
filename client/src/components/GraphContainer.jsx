@@ -4,7 +4,7 @@ import { SettingsProvider } from '../hooks/useSettings.js';
 const GraphContainer = ({ children }) => {
     const [settings, setSettings] = useState({
         contentModifiedTS: 0,
-        source: 'entityTypes',
+        source: 'artifacts',
         selection: [],
         sourceRefresh: {
             busy: false,
@@ -17,9 +17,8 @@ const GraphContainer = ({ children }) => {
             direction: 'both',
         },
         edges: {
-            scope: true,
-            hard: true,
-            soft: true,
+            compile: true,
+            provided: true,
         },
     });
     const context = useMemo(() => ({ settings, setSettings }), [settings]);

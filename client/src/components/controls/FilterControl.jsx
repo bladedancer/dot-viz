@@ -76,14 +76,8 @@ const FilterControl = () => {
                             weight: (e) => {
                                 let linkType = e.data('linkType');
                                 if (
-                                    (linkType == 'extends' && ef.extends) ||
-                                    (linkType == 'component' && ef.component) ||
-                                    (linkType == 'reference' &&
-                                        e.data('isHard') &&
-                                        ef.referenceHard) ||
-                                    (linkType == 'reference' &&
-                                        !e.data('isHard') &&
-                                        ef.referenceSoft)
+                                    (linkType == 'compile' && ef.compile) ||
+                                    (linkType == 'provided' && ef.provided)
                                 ) {
                                     // Along an enabled edge
                                     return 1;
@@ -102,17 +96,10 @@ const FilterControl = () => {
 
             cy.edges().forEach((e) => {
                 let linkType = e.data('linkType');
-                if (linkType == 'extends') {
-                    ef.extends ? e.show() : e.hide();
-                } else if (linkType == 'component') {
-                    ef.component ? e.show() : e.hide();
-                } else if (linkType == 'reference') {
-                    const isHard = e.data('isHard');
-                    if (isHard) {
-                        ef.referenceHard ? e.show() : e.hide();
-                    } else {
-                        ef.referenceSoft ? e.show() : e.hide();
-                    }
+                if (linkType == 'compile') {
+                    ef.compile ? e.show() : e.hide();
+                } else if (linkType == 'provided') {
+                    ef.provided ? e.show() : e.hide();
                 }
             });
         });
@@ -178,47 +165,25 @@ const FilterControl = () => {
                     />
                 )}
                 <div className="edge-filter-control">
-                    {settings.source === 'entityTypes' && (
-                        <Toggle
-                            checked={settings.edgeFilter.extends}
-                            onChange={() =>
-                                setEdgeFilter({
-                                    extends: !settings.edgeFilter.extends,
-                                })
-                            }
-                        >
-                            Inheritance
-                        </Toggle>
-                    )}
                     <Toggle
-                        checked={settings.edgeFilter.component}
+                        checked={settings.edgeFilter.compile}
                         onChange={() =>
                             setEdgeFilter({
-                                component: !settings.edgeFilter.component,
+                                compile: !settings.edgeFilter.compile,
                             })
                         }
                     >
-                        Component
+                        Compile
                     </Toggle>
                     <Toggle
-                        checked={settings.edgeFilter.referenceHard}
+                        checked={settings.edgeFilter.provided}
                         onChange={() =>
                             setEdgeFilter({
-                                referenceHard: !settings.edgeFilter.referenceHard,
+                                provided: !settings.edgeFilter.provided,
                             })
                         }
                     >
-                        Hard Reference
-                    </Toggle>
-                    <Toggle
-                        checked={settings.edgeFilter.referenceSoft}
-                        onChange={() =>
-                            setEdgeFilter({
-                                referenceSoft: !settings.edgeFilter.referenceSoft,
-                            })
-                        }
-                    >
-                        Soft Reference
+                        Provided
                     </Toggle>
                 </div>
             </div>

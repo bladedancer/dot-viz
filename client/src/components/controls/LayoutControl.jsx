@@ -656,16 +656,10 @@ const supportedLayouts = {
         // Divisor to compute edge forces
         edgeElasticity: function (edge) {
             switch (edge.data('linkType')) {
-                case 'extends':
-                    return supportedLayouts.cose.edgeElasticityExtends || 32;
-                case 'component':
-                    return supportedLayouts.cose.edgeElasticityComponent || 32;
-                case 'reference':
-                    return edge.data('isHard')
-                        ? supportedLayouts.cose.edgeElasticityReferenceHard ||
-                              32
-                        : supportedLayouts.cose.edgeElasticityReferenceSoft ||
-                              32;
+                case 'compile':
+                    return supportedLayouts.cose.edgeElasticityCompile || 32;
+                case 'provided':
+                    return supportedLayouts.cose.edgeElasticityProvided || 32;
                 default:
                     return 32;
             }
@@ -680,16 +674,10 @@ const supportedLayouts = {
         // Ideal edge (non nested) length
         idealEdgeLength: function (edge) {
             switch (edge.data('linkType')) {
-                case 'extends':
-                    return supportedLayouts.cose.idealEdgeLengthExtends || 32;
-                case 'component':
-                    return supportedLayouts.cose.idealEdgeLengthComponent || 32;
-                case 'reference':
-                    return edge.data('isHard')
-                        ? supportedLayouts.cose.idealEdgeLengthReferenceHard ||
-                              32
-                        : supportedLayouts.cose.idealEdgeLengthReferenceSoft ||
-                              32;
+                case 'compile':
+                    return supportedLayouts.cose.idealEdgeLengthCompile || 32;
+                case 'provided':
+                    return supportedLayouts.cose.idealEdgeLengthProvided || 32;
                 default:
                     return 32;
             }
@@ -755,24 +743,14 @@ const supportedLayouts = {
                     title: 'Cooling Factor',
                     default: 0.99,
                 },
-                edgeElasticityExtends: {
+                edgeElasticityCompile: {
                     type: 'number',
-                    title: 'Edge Elasticity (Extends)',
+                    title: 'Edge Elasticity (Compile)',
                     default: 32,
                 },
-                edgeElasticityComponent: {
+                edgeElasticityProvided: {
                     type: 'number',
-                    title: 'Edge Elasticity (Component)',
-                    default: 32,
-                },
-                edgeElasticityReferenceHard: {
-                    type: 'number',
-                    title: 'Edge Elasticity (Reference:Hard)',
-                    default: 32,
-                },
-                edgeElasticityReferenceSoft: {
-                    type: 'number',
-                    title: 'Edge Elasticity (Refernce:Soft)',
+                    title: 'Edge Elasticity (Provided)',
                     default: 32,
                 },
                 fit: {
@@ -785,24 +763,14 @@ const supportedLayouts = {
                     title: 'Gravity',
                     default: 1,
                 },
-                idealEdgeLengthExtends: {
+                idealEdgeLengthCompile: {
                     type: 'number',
-                    title: 'Ideal Edge Length (Extends)',
+                    title: 'Ideal Edge Length (Compile)',
                     default: 32,
                 },
-                idealEdgeLengthComponent: {
+                idealEdgeLengthProvided: {
                     type: 'number',
-                    title: 'Ideal Edge Length (Component)',
-                    default: 32,
-                },
-                idealEdgeLengthReferenceHard: {
-                    type: 'number',
-                    title: 'Ideal Edge Length (Reference:Hard)',
-                    default: 32,
-                },
-                idealEdgeLengthReferenceSoft: {
-                    type: 'number',
-                    title: 'Ideal Edge Length (Reference:Soft)',
+                    title: 'Ideal Edge Length (Provided)',
                     default: 32,
                 },
                 initialTemp: {
@@ -1101,16 +1069,10 @@ const supportedLayouts = {
         // - The edge length can be longer or shorter if the forces are set to extreme values
         springLength: (edge) => {
             switch (edge.data('linkType')) {
-                case 'extends':
-                    return supportedLayouts.euler.springLengthExtends || 80;
-                case 'component':
-                    return supportedLayouts.euler.springLengthComponent || 160;
-                case 'reference':
-                    return edge.data('isHard')
-                        ? supportedLayouts.euler.springLengthReferenceHard ||
-                              160
-                        : supportedLayouts.euler.springLengthReferenceSoft ||
-                              160;
+                case 'compile':
+                    return supportedLayouts.euler.springLengthCompile || 80;
+                case 'provided':
+                    return supportedLayouts.euler.springLengthProvided || 160;
                 default:
                     return 80;
             }
@@ -1122,18 +1084,12 @@ const supportedLayouts = {
         // - Higher values give tighter springs
         springCoeff: (edge) => {
             switch (edge.data('linkType')) {
-                case 'extends':
-                    return supportedLayouts.euler.springCoeffExtends || 0.0008;
-                case 'component':
+                case 'compile':
+                    return supportedLayouts.euler.springCoeffCompile || 0.0008;
+                case 'provided':
                     return (
-                        supportedLayouts.euler.springCoeffComponent || 0.0008
+                        supportedLayouts.euler.springCoeffProvided || 0.0008
                     );
-                case 'reference':
-                    return edge.data('isHard')
-                        ? supportedLayouts.euler.springCoeffReferenceHard ||
-                              0.0008
-                        : supportedLayouts.euler.springCoeffReferenceSoft ||
-                              0.0008;
                 default:
                     return 0.0008;
             }
@@ -1222,50 +1178,26 @@ const supportedLayouts = {
                     title: 'Refresh',
                     default: 10,
                 },
-                springLengthExtends: {
+                springLengthCompile: {
                     type: 'number',
-                    title: 'Spring Length (Extends)',
+                    title: 'Spring Length (Compile)',
                     default: 80,
                 },
-                springLengthComponent: {
+                springLengthProvided: {
                     type: 'number',
-                    title: 'Spring Length (Component)',
+                    title: 'Spring Length (Provided)',
                     default: 160,
                 },
-                springLengthReferenceHard: {
+                springCoeffCompile: {
                     type: 'number',
-                    title: 'Spring Length (Reference:Hard)',
-                    default: 160,
-                },
-                springLengthReferenceSoft: {
-                    type: 'number',
-                    title: 'Spring Length (Reference:Soft)',
-                    default: 160,
-                },
-                springCoeffExtends: {
-                    type: 'number',
-                    title: 'Spring Coefficient (Extends)',
+                    title: 'Spring Coefficient (Compile)',
                     default: 0.0008,
                     minimum: 0,
                     maximum: 1,
                 },
-                springCoeffComponent: {
+                springCoeffProvided: {
                     type: 'number',
-                    title: 'Spring Coefficient (Component)',
-                    default: 0.0008,
-                    minimum: 0,
-                    maximum: 1,
-                },
-                springCoeffReferenceHard: {
-                    type: 'number',
-                    title: 'Spring Coefficient (Reference:Hard)',
-                    default: 0.0008,
-                    minimum: 0,
-                    maximum: 1,
-                },
-                springCoeffReferenceSoft: {
-                    type: 'number',
-                    title: 'Spring Coefficient (ReferenceSoft)',
+                    title: 'Spring Coefficient (Provided)',
                     default: 0.0008,
                     minimum: 0,
                     maximum: 1,
@@ -1306,18 +1238,12 @@ const supportedLayouts = {
         // Ideal edge (non nested) length
         idealEdgeLength: function (edge) {
             switch (edge.data('linkType')) {
-                case 'extends':
-                    return supportedLayouts.fcose.idealEdgeLengthExtends || 50;
-                case 'component':
+                case 'compile':
+                    return supportedLayouts.fcose.idealEdgeLengthCompile || 50;
+                case 'provided':
                     return (
-                        supportedLayouts.fcose.idealEdgeLengthComponent || 50
+                        supportedLayouts.fcose.idealEdgeLengthProvided || 50
                     );
-                case 'reference':
-                    return edge.data('isHard')
-                        ? supportedLayouts.fcose.idealEdgeLengthReferenceHard ||
-                              50
-                        : supportedLayouts.fcose.idealEdgeLengthReferenceSoft ||
-                              50;
                 default:
                     return 50;
             }
@@ -1325,18 +1251,12 @@ const supportedLayouts = {
         // Divisor to compute edge forces
         edgeElasticity: function (edge) {
             switch (edge.data('linkType')) {
-                case 'extends':
-                    return supportedLayouts.fcose.edgeElasticityExtends || 0.45;
-                case 'component':
+                case 'compile':
+                    return supportedLayouts.fcose.edgeElasticityCompile || 0.45;
+                case 'provided':
                     return (
-                        supportedLayouts.fcose.edgeElasticityComponent || 0.45
+                        supportedLayouts.fcose.edgeElasticityProvided || 0.45
                     );
-                case 'reference':
-                    return edge.data('isHard')
-                        ? supportedLayouts.fcose.edgeElasticityReferenceHard ||
-                              0.45
-                        : supportedLayouts.fcose.edgeElasticityReferenceSoft ||
-                              0.45;
                 default:
                     return 0.45;
             }
@@ -1512,44 +1432,24 @@ const supportedLayouts = {
                     default: 6500,
                 },
 
-                edgeElasticityExtends: {
+                edgeElasticityCompile: {
                     type: 'number',
-                    title: 'Edge Elasticity (Extends)',
+                    title: 'Edge Elasticity (Compile)',
                     default: 0.45,
                 },
-                edgeElasticityComponent: {
+                edgeElasticityProvided: {
                     type: 'number',
-                    title: 'Edge Elasticity (Component)',
+                    title: 'Edge Elasticity (Provided)',
                     default: 0.45,
                 },
-                edgeElasticityReferenceHard: {
+                idealEdgeLengthCompile: {
                     type: 'number',
-                    title: 'Edge Elasticity (Reference:Hard)',
-                    default: 0.45,
-                },
-                edgeElasticityReferenceSoft: {
-                    type: 'number',
-                    title: 'Edge Elasticity (Refernce:Soft)',
-                    default: 0.45,
-                },
-                idealEdgeLengthExtends: {
-                    type: 'number',
-                    title: 'Ideal Edge Length (Extends)',
+                    title: 'Ideal Edge Length (Compile)',
                     default: 50,
                 },
-                idealEdgeLengthComponent: {
+                idealEdgeLengthProvided: {
                     type: 'number',
-                    title: 'Ideal Edge Length (Component)',
-                    default: 50,
-                },
-                idealEdgeLengthReferenceHard: {
-                    type: 'number',
-                    title: 'Ideal Edge Length (Reference:Hard)',
-                    default: 50,
-                },
-                idealEdgeLengthReferenceSoft: {
-                    type: 'number',
-                    title: 'Ideal Edge Length (Reference:Soft)',
+                    title: 'Ideal Edge Length (Provided)',
                     default: 50,
                 },
 

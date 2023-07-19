@@ -1,5 +1,5 @@
-# FED Visualizer
+# Dot Visualizer
 
-Visualize the EntityType graph in a Federated Archive.
+Visualize dots with physics.
 
-See [https://bladedancer.github.io/fed-viz/](https://bladedancer.github.io/fed-viz/)
+See [https://bladedancer.github.io/dot-viz/](https://bladedancer.github.io/dot-viz/)

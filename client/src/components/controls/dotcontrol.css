@@ -1,0 +1,12 @@
+.dot-control {
+    border: none;
+    width: 100%
+}
+
+.dot-control button {
+    width: 100%
+}
+
+.dot-control svg {
+    margin-right: 5px;
+}
