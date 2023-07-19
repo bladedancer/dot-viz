@@ -29,6 +29,7 @@ const App = () => {
         edgeFilter: {
             compile: true,
             provided: true,
+            test: false,
         },
     });
     const context = useMemo(() => ({ settings, setSettings }), [settings]);

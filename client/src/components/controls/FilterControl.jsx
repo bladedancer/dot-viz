@@ -78,7 +78,8 @@ const FilterControl = () => {
                                 let linkType = e.data('linkType');
                                 if (
                                     (linkType == 'compile' && ef.compile) ||
-                                    (linkType == 'provided' && ef.provided)
+                                    (linkType == 'provided' && ef.provided) ||
+                                    (linkType == 'test' && ef.test)
                                 ) {
                                     // Along an enabled edge
                                     return 1;
@@ -101,6 +102,8 @@ const FilterControl = () => {
                     ef.compile ? e.show() : e.hide();
                 } else if (linkType == 'provided') {
                     ef.provided ? e.show() : e.hide();
+                } else if (linkType == 'test') {
+                    ef.test ? e.show() : e.hide();
                 }
             });
         });
@@ -185,6 +188,16 @@ const FilterControl = () => {
                         }
                     >
                         Provided
+                    </Toggle>
+                    <Toggle
+                        checked={settings.edgeFilter.test}
+                        onChange={() =>
+                            setEdgeFilter({
+                                test: !settings.edgeFilter.test,
+                            })
+                        }
+                    >
+                        Test
                     </Toggle>
                 </div>
             </div>
