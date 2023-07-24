@@ -19,6 +19,7 @@ const GraphContainer = ({ children }) => {
         edges: {
             compile: true,
             provided: true,
+            grouping: true
         },
     });
     const context = useMemo(() => ({ settings, setSettings }), [settings]);

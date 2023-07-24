@@ -34,15 +34,25 @@ const Graph = ({ children }) => {
                     console.error('Link not found', l);
                     return;
                 }
+
+                 // HACK hide group links for clumps
+                let col = l.linkType === "grouping" ? {
+                        source: '#FFFFFF',
+                        target: '#FFFFFF'
+                    } : {
+                        source: n.color,
+                        target: targetNode.color
+                    };
+
                 els.push({
                     data: {
                         id: `${l.linkType}-${l.source}-${l.target}`,
                         source: l.source,
                         target: l.target,
                         label: l.label,
-                        sourceColor: n.color,
-                        targetColor: targetNode.color,
-                        gradient: `${n.color} ${targetNode.color}`,
+                        sourceColor: col.source,
+                        targetColor: col.target, 
+                        gradient: `${col.source} ${col.target}`,
                         linkType: l.linkType,
                         isHard: l.isHard
                     },

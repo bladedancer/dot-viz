@@ -30,6 +30,7 @@ const App = () => {
             compile: true,
             provided: true,
             test: false,
+            grouping: true
         },
     });
     const context = useMemo(() => ({ settings, setSettings }), [settings]);

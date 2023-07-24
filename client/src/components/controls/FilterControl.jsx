@@ -28,7 +28,6 @@ const FilterControl = () => {
             let nf = settings.nodeFilter;
             let ef = settings.edgeFilter;
 
-            console.log("here");
             cy.nodes().forEach((n) => {
                 // Ids take precedence
                 try {
@@ -79,6 +78,7 @@ const FilterControl = () => {
                                 if (
                                     (linkType == 'compile' && ef.compile) ||
                                     (linkType == 'provided' && ef.provided) ||
+                                    (linkType == 'grouping' && ef.grouping) ||
                                     (linkType == 'test' && ef.test)
                                 ) {
                                     // Along an enabled edge
@@ -102,6 +102,8 @@ const FilterControl = () => {
                     ef.compile ? e.show() : e.hide();
                 } else if (linkType == 'provided') {
                     ef.provided ? e.show() : e.hide();
+                } else if (linkType == 'grouping') {
+                    ef.grouping ? e.show() : e.hide();
                 } else if (linkType == 'test') {
                     ef.test ? e.show() : e.hide();
                 }
@@ -198,6 +200,16 @@ const FilterControl = () => {
                         }
                     >
                         Test
+                    </Toggle>
+                    <Toggle
+                        checked={settings.edgeFilter.grouping}
+                        onChange={() =>
+                            setEdgeFilter({
+                                grouping: !settings.edgeFilter.grouping,
+                            })
+                        }
+                    >
+                        Grouping
                     </Toggle>
                 </div>
             </div>

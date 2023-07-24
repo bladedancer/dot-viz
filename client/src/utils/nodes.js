@@ -143,9 +143,27 @@ const parseDot = (dot) => {
 
         return prev;
     }, {})
+    let groupKeys = Object.keys(groups);
+
+    // Add fake links between group members - to aid with clumping. 
+    groupKeys.forEach((g,i) => {
+        let groupArtifacts = Object.values(artifacts).filter(a => a.group === g);
+        for (let i = 1; i < groupArtifacts.length; i++) {
+            for (let j = 0; i < groupArtifacts.length-1; i++) {
+                groupArtifacts[i].links.push({
+                    source: groupArtifacts[i].group + ":" + groupArtifacts[i].name,
+                    target: groupArtifacts[j].group + ":" + groupArtifacts[j].name,
+                    linkType: "grouping",
+                    size: 1,
+                    type: 'line',
+                    color:  "#FF0000",
+                    weight: 5,
+                });
+            }
+        }
+    });
 
     // Colorize Artifacts
-    let groupKeys = Object.keys(groups);
     Object.keys(artifacts).forEach(a => {
         artifacts[a].color = color(groupKeys.indexOf(artifacts[a].group), groupKeys.length);
     });
