@@ -1,12 +1,14 @@
 import React, { useState, useLayoutEffect, useEffect, useRef } from 'react';
 import CytoscapeComponent from 'react-cytoscapejs';
-import { useSetSelection, useSettingsContext } from '../hooks/useSettings.js';
+import { useSetSelection, useSettingsContext, useBumpLayoutTrigger } from '../hooks/useSettings.js';
 import { useCy } from '../hooks/useCy';
+import './graph.css';
 
 const Graph = ({ children }) => {
     const [elements, setElements] = useState([]);
     const { settings } = useSettingsContext();
     const { setSelection } = useSetSelection();
+    const { bumpLayoutTrigger } = useBumpLayoutTrigger();
     const cy = useCy();
 
     // Convert to elements
@@ -23,6 +25,8 @@ const Graph = ({ children }) => {
                     root: !n.isRoot,
                     group: n.group,
                     depth: n.depth,
+                    nodeWidth: Math.max(n.name.length * 7 + 16, 40),
+                    nodeHeight: 28,
                 },
                 classes: `${n.isRoot ? 'root-node ' : ''}`,
             });
@@ -60,6 +64,7 @@ const Graph = ({ children }) => {
             });
         });
         setElements(els);
+        bumpLayoutTrigger();
     }, [settings.source, settings.nodeData]);
 
     const cytoscapeStylesheet = [
@@ -67,9 +72,8 @@ const Graph = ({ children }) => {
             selector: 'node',
             style: {
                 'background-color': 'data(color)',
-                width: 'label',
-                height: 'label',
-                padding: '8px',
+                width: 'data(nodeWidth)',
+                height: 'data(nodeHeight)',
                 shape: 'round-rectangle',
                 'min-zoomed-font-size': 8,
             },
@@ -159,12 +163,19 @@ const Graph = ({ children }) => {
     }, [cy]);
 
     return (
-        <CytoscapeComponent
-            global="cy"
-            elements={elements}
-            style={{ top: 0, bottom: 0, position: 'absolute', width: '100%' }}
-            stylesheet={cytoscapeStylesheet}
-        />
+        <div style={{ top: 0, bottom: 0, left: 0, right: 0, position: 'absolute' }}>
+            <CytoscapeComponent
+                global="cy"
+                elements={elements}
+                style={{ top: 0, bottom: 0, left: 0, right: 0, position: 'absolute', width: '100%' }}
+                stylesheet={cytoscapeStylesheet}
+            />
+            {settings.loading && (
+                <div className="graph-loading-overlay">
+                    <div className="graph-loading-spinner" />
+                </div>
+            )}
+        </div>
     );
 };
 

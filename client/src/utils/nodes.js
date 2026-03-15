@@ -10,7 +10,11 @@ const readDot = (dotfile) => {
     return new Promise((resolve, reject) => {
         var fr = new FileReader();  
         fr.onload = () => {
-            resolve(parseDot(fr.result));
+            try {
+                resolve(parseDot(fr.result));
+            } catch (err) {
+                reject(err);
+            }
         };
         fr.onerror = reject;
         fr.readAsText(dotfile);
@@ -74,8 +78,13 @@ const nodeToGroup = (n) => {
 }
 
 const mergeLinks = (l, r) => {
-    let links = [...l, ...r]; // TODO REALLY MERGE AND REMOVE DUPLICATES
-    return links;
+    const merged = [...l];
+    r.forEach(link => {
+        if (!merged.find(t => t.source === link.source && t.target === link.target && t.linkType === link.linkType)) {
+            merged.push(link);
+        }
+    });
+    return merged;
 }
 
 const parseDot = (dot) => {
@@ -123,10 +132,18 @@ const parseDot = (dot) => {
 
     // Compose Links
     links.forEach(l => {
-        // Avoid duplicates (not entirely right but will do)
-        if (!artifacts[l.source].links.find(t => t.target === l.target)) {
+        // Skip self-loops (can arise from classifier variants normalising to the same 2-part id)
+        if (l.source === l.target) return;
+        if (!artifacts[l.source]) return;
+        if (!artifacts[l.source].links.find(t => t.target === l.target && t.linkType === l.linkType)) {
             artifacts[l.source].links.push(l);
         }
+    });
+
+    // Mark root nodes (nodes with no incoming edges)
+    const targetIds = new Set(links.map(l => l.target));
+    Object.keys(artifacts).forEach(k => {
+        artifacts[k].isRoot = !targetIds.has(k);
     });
 
     // Extract Groups
@@ -145,11 +162,12 @@ const parseDot = (dot) => {
     }, {})
     let groupKeys = Object.keys(groups);
 
-    // Add fake links between group members - to aid with clumping. 
-    groupKeys.forEach((g,i) => {
+    // Add fake links between group members - to aid with clumping.
+    groupKeys.forEach((g) => {
         let groupArtifacts = Object.values(artifacts).filter(a => a.group === g);
         for (let i = 1; i < groupArtifacts.length; i++) {
-            for (let j = 0; i < groupArtifacts.length-1; i++) {
+            for (let j = 0; j < groupArtifacts.length - 1; j++) {
+                if (i === j) continue;
                 groupArtifacts[i].links.push({
                     source: groupArtifacts[i].group + ":" + groupArtifacts[i].name,
                     target: groupArtifacts[j].group + ":" + groupArtifacts[j].name,

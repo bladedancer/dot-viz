@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import { useCy } from '../../hooks/useCy.js';
 import {
     useSetNodeFilter,
@@ -19,8 +19,20 @@ const FilterControl = () => {
     const { settings } = useSettingsContext();
     const { setNodeFilter } = useSetNodeFilter();
     const { setEdgeFilter } = useSetEdgeFilter();
+    const debounceTimer = useRef(null);
 
-    useEffect(async () => {
+    const debouncedSetNodeFilter = useCallback((value) => {
+        clearTimeout(debounceTimer.current);
+        debounceTimer.current = setTimeout(() => {
+            setNodeFilter({
+                filter: value,
+                connected: false,
+                direction: settings.nodeFilter.direction,
+            });
+        }, 200);
+    }, [setNodeFilter, settings.nodeFilter.direction]);
+
+    useEffect(() => {
         if (!cy) {
             return;
         }
@@ -122,13 +134,7 @@ const FilterControl = () => {
                             name="filter"
                             placeholder="Filter displayed resources"
                             value={settings.nodeFilter.filter}
-                            onChange={(e) =>
-                                setNodeFilter({
-                                    filter: e.target.value,
-                                    connected: false,
-                                    direction: settings.nodeFilter.direction,
-                                })
-                            } // Need to debounce this
+                            onChange={(e) => debouncedSetNodeFilter(e.target.value)}
                         />
                     </label>
                 </div>

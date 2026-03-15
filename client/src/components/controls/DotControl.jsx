@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { FiUpload, FiRefreshCw } from 'react-icons/fi';
-import { useSetNodeData } from '../../hooks/useSettings';
+import { useSetNodeData, useSetLoading } from '../../hooks/useSettings';
 import nodify from '../../utils/nodes';
 import './dotcontrol.css';
 
@@ -8,23 +8,33 @@ const DotControl = ({}) => {
     const dotFile = useRef();
     const [busy, setBusy] = useState(false);
     const [selectedFile, setSelectedFile] = useState(null);
+    const [error, setError] = useState(null);
     const { setNodeData } = useSetNodeData();
+    const { setLoading } = useSetLoading();
 
     const processFile = useCallback(async () => {
         setBusy(true);
-        const nodes = await nodify(selectedFile);
-        setNodeData(nodes);
+        setLoading(true);
+        setError(null);
+        try {
+            const nodes = await nodify(selectedFile);
+            setNodeData(nodes);
+        } catch (err) {
+            setError(`Failed to parse file: ${err.message || err}`);
+        }
         setBusy(false);
+        setLoading(false);
     }, [selectedFile]);
 
     const clearSelection = useCallback(async () => {
         setSelectedFile(null);
+        setError(null);
         dotFile.current.value = '';
     }, [dotFile, setSelectedFile]);
 
-    useEffect(async () => {
+    useEffect(() => {
         if (selectedFile) {
-            await processFile();
+            processFile();
         }
     }, [selectedFile, processFile]);
 
@@ -47,6 +57,7 @@ const DotControl = ({}) => {
                     onClick={clearSelection}
                     disabled={busy}
                 />
+                {error && <div className="dot-control-error">{error}</div>}
             </div>
         </>
     );

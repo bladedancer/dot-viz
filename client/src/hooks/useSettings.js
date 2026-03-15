@@ -24,51 +24,60 @@ export function useSettingsContext() {
 }
 
 export function useSetNodeData() {
-    const { settings, setSettings } = useSettingsContext();
+    const { setSettings } = useSettingsContext();
     return {
         setNodeData: (nodeData) =>
-            setSettings({ ...settings, nodeData, selection: [] }),
+            setSettings(prev => ({ ...prev, nodeData, selection: [] })),
     };
 }
 
 export function useSetNodeFilter() {
-    const { settings, setSettings } = useSettingsContext();
+    const { setSettings } = useSettingsContext();
     return {
         setNodeFilter: (nodeFilter) =>
-            setSettings({
-                ...settings,
-                nodeFilter: {
-                    ...settings.nodeFilter,
-                    ...nodeFilter,
-                },
-            }),
+            setSettings(prev => ({
+                ...prev,
+                nodeFilter: { ...prev.nodeFilter, ...nodeFilter },
+            })),
     };
 }
 
 export function useSetEdgeFilter() {
-    const { settings, setSettings } = useSettingsContext();
+    const { setSettings } = useSettingsContext();
     return {
         setEdgeFilter: (edgeFilter) =>
-            setSettings({
-                ...settings,
-                edgeFilter: {
-                    ...settings.edgeFilter,
-                    ...edgeFilter,
-                },
-            }),
+            setSettings(prev => ({
+                ...prev,
+                edgeFilter: { ...prev.edgeFilter, ...edgeFilter },
+            })),
     };
 }
 
 export function useSetSelection() {
-    const { settings, setSettings } = useSettingsContext();
+    const { setSettings } = useSettingsContext();
     return {
-        setSelection: (selection) => setSettings({ ...settings, selection }),
+        setSelection: (selection) => setSettings(prev => ({ ...prev, selection })),
     };
 }
 
 export function useSetSource() {
-    const { settings, setSettings } = useSettingsContext();
+    const { setSettings } = useSettingsContext();
     return {
-        setSource: (source) => setSettings({ ...settings, source }),
+        setSource: (source) => setSettings(prev => ({ ...prev, source })),
+    };
+}
+
+export function useBumpLayoutTrigger() {
+    const { setSettings } = useSettingsContext();
+    return {
+        bumpLayoutTrigger: () =>
+            setSettings(prev => ({ ...prev, layoutTrigger: (prev.layoutTrigger || 0) + 1 })),
+    };
+}
+
+export function useSetLoading() {
+    const { setSettings } = useSettingsContext();
+    return {
+        setLoading: (loading) => setSettings(prev => ({ ...prev, loading })),
     };
 }

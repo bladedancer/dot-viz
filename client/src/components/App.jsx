@@ -15,6 +15,8 @@ const App = () => {
         fed: null,
         source: 'artifacts',
         selection: [],
+        layoutTrigger: 0,
+        loading: false,
 
         nodeData: {
             groups: [],
@@ -47,7 +49,7 @@ const App = () => {
             </ControlsContainer>
             <ControlsContainer position={'bottom-right'}>
                 <ZoomControl />
-                <LayoutControl />
+                <LayoutControl layoutTrigger={settings.layoutTrigger} />
             </ControlsContainer>
         </SettingsProvider>
     );
