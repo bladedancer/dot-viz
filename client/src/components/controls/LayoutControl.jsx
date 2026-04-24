@@ -17,8 +17,6 @@ import cise from 'cytoscape-cise';
 import klay from 'cytoscape-klay';
 import euler from 'cytoscape-euler';
 import Button from '../utils/Button.jsx';
-import { async } from 'regenerator-runtime';
-import e from 'cors';
 
 Cytoscape.use(euler);
 Cytoscape.use(klay);
@@ -1782,13 +1780,12 @@ const LayoutControl = ({ className, style, children, layoutTrigger }) => {
         return supportedLayouts;
     }, [layoutOverrides]);
 
-    const runLayout = useCallback(async () => {
+    const runLayout = useCallback(() => {
         if (activeLayout) {
             activeLayout.stop();
-            await activeLayout.pon('layoutstop'); // Think there's a race wiith the disable effect.
         }
 
-        let lay = cy.elements(':visible').layout(layouts[layout]);
+        const lay = cy.elements(':visible').layout(layouts[layout]);
         if (lay.options.animate) {
             setActiveLayout(lay);
         } else {
@@ -1796,7 +1793,7 @@ const LayoutControl = ({ className, style, children, layoutTrigger }) => {
         }
 
         lay.run();
-    }, [cy, layout, activeLayout, setActiveLayout]);
+    }, [cy, layout, activeLayout, setActiveLayout, layouts]);
 
     const stopLayout = useCallback(() => {
         activeLayout && activeLayout.stop();
@@ -1804,7 +1801,7 @@ const LayoutControl = ({ className, style, children, layoutTrigger }) => {
     }, [cy, activeLayout, setActiveLayout]);
 
     // Update layout on change
-    useEffect(async () => {
+    useEffect(() => {
         if (!cy) {
             return;
         }
@@ -1813,17 +1810,19 @@ const LayoutControl = ({ className, style, children, layoutTrigger }) => {
     }, [cy, layout]);
 
     // Disable stop button when layout auto-stops
-    useEffect(async () => {
+    useEffect(() => {
         if (!activeLayout) {
             return;
         }
-        await activeLayout.pon('layoutstop');
-        activeLayout.stop(); // Explicitly stop it anyway
-        setActiveLayout(null);
-    }, [activeLayout, setActiveLayout]);
+        const current = activeLayout;
+        current.pon('layoutstop').then(() => {
+            current.stop();
+            setActiveLayout(prev => prev === current ? null : prev);
+        });
+    }, [activeLayout]);
 
     // When the overrides change rerun layout
-    useEffect(async () => {
+    useEffect(() => {
         if (isMounted.current) {
             runLayout();
         } else {

@@ -22,9 +22,9 @@ const DotControl = ({}) => {
         dotFile.current.value = '';
     }, [dotFile, setSelectedFile]);
 
-    useEffect(async () => {
+    useEffect(() => {
         if (selectedFile) {
-            await processFile();
+            processFile();
         }
     }, [selectedFile, processFile]);
 

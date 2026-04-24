@@ -20,7 +20,7 @@ const FilterControl = () => {
     const { setNodeFilter } = useSetNodeFilter();
     const { setEdgeFilter } = useSetEdgeFilter();
 
-    useEffect(async () => {
+    useEffect(() => {
         if (!cy) {
             return;
         }

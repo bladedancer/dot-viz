@@ -6,16 +6,7 @@ function color(index, domain) {
         .hex();
 }
 
-const readDot = (dotfile) => {
-    return new Promise((resolve, reject) => {
-        var fr = new FileReader();  
-        fr.onload = () => {
-            resolve(parseDot(fr.result));
-        };
-        fr.onerror = reject;
-        fr.readAsText(dotfile);
-      });
-}
+const readDot = (file) => file.text().then(parseDot);
 
 const parseNode = (l) => {
     const id = l.split('"')[1].trim();
@@ -36,32 +27,37 @@ const parseNode = (l) => {
 
 const parseEdge = (l) => {
     const link = l.split(' -> ');
-    
+
     const details = (e) => {
         const data = e.split('"')[1].trim();
         return {
             group: data.split(":")[0],
             name: data.split(":")[1],
             packaging: data.split(":")[2],
-            scope: data.split(":")[3] 
+            scope: data.split(":")[3],
         };
-    }
+    };
+
+    // Extract linkType from [style="..."] attribute as fallback
+    const styleMatch = l.match(/\[style="([^"]+)"/);
+    const styleAttr = styleMatch ? styleMatch[1] : null;
+
     const toLink = (from, to) => {
-        let fromDetails = details(from);
-        let toDetails = details(to);
+        const fromDetails = details(from);
+        const toDetails = details(to);
         return {
             source: fromDetails.group + ":" + fromDetails.name,
             target: toDetails.group + ":" + toDetails.name,
-            linkType: toDetails.scope,
+            linkType: toDetails.scope || styleAttr || 'compile',
             size: 1,
             type: 'line',
-            color:  "#000000",
+            color: "#000000",
             weight: 5,
         };
     };
 
-    return toLink(link[0].trim(), link[1].trim())
-}
+    return toLink(link[0].trim(), link[1].trim());
+};
 
 const nodeToGroup = (n) => {
     return {
@@ -117,7 +113,9 @@ const parseDot = (dot) => {
                 artifacts[n.id] = n;
             }
         } else if (inLinks) {
-            links.push(parseEdge(l));
+            if (l.includes(' -> ')) {
+                links.push(parseEdge(l));
+            }
         }
     });
 
@@ -181,9 +179,4 @@ const parseDot = (dot) => {
     };
 }
 
-const nodify = async (dotfile) => {
-    const dotData = await readDot(dotfile);
-    return dotData;
-};
-
-export default nodify;
+export default readDot;

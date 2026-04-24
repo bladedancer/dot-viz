@@ -30,7 +30,7 @@ const App = () => {
         edgeFilter: {
             compile: true,
             provided: true,
-            test: false,
+            test: true,
             grouping: true,
         },
     });
