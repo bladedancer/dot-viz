@@ -1756,7 +1756,7 @@ const supportedLayouts = {
     },
 };
 
-const LayoutControl = ({ className, style, children }) => {
+const LayoutControl = ({ className, style, children, layoutTrigger }) => {
     const cy = useCy();
     const [opened, setOpened] = useState(false);
     const [layoutConfigOpened, setLayoutConfigOpened] = useState(false);
@@ -1830,6 +1830,12 @@ const LayoutControl = ({ className, style, children }) => {
             isMounted.current = true;
         }
     }, [layoutConfigOpened, layoutOverrides]);
+
+    // Rerun layout when triggered externally (e.g. after new data loads)
+    useEffect(() => {
+        if (!cy || !layoutTrigger) return;
+        runLayout();
+    }, [layoutTrigger]);
 
     return (
         <>

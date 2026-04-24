@@ -72,3 +72,11 @@ export function useSetSource() {
         setSource: (source) => setSettings({ ...settings, source }),
     };
 }
+
+export function useBumpLayoutTrigger() {
+    const { settings, setSettings } = useSettingsContext();
+    return {
+        bumpLayoutTrigger: () =>
+            setSettings({ ...settings, layoutTrigger: (settings.layoutTrigger || 0) + 1 }),
+    };
+}
