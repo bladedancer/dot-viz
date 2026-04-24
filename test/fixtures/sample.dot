@@ -1,0 +1,13 @@
+digraph {
+  // Node Definitions:
+  "com.example:alpha:jar" [label="com.example:alpha:jar"];
+  "com.example:beta:jar" [label="com.example:beta:jar"];
+  "com.example:gamma:jar" [label="com.example:gamma:jar"];
+  "org.other:delta:jar" [label="org.other:delta:jar"];
+  "org.other:epsilon:jar" [label="org.other:epsilon:jar"];
+  // Edge Definitions:
+  "com.example:alpha:jar" -> "com.example:beta:jar" [style="compile"];
+  "com.example:alpha:jar" -> "com.example:gamma:jar" [style="compile"];
+  "com.example:beta:jar" -> "org.other:delta:jar" [style="provided"];
+  "com.example:gamma:jar" -> "org.other:epsilon:jar" [style="test"];
+}

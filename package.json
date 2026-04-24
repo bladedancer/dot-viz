@@ -6,6 +6,7 @@
   "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "test:e2e": "playwright test",
     "start": "nodemon --ignore 'store/*' --ignore 'client/*' src/index.js",
     "react-dev": "webpack --watch",
     "build": "webpack"
