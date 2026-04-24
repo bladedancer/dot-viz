@@ -10,15 +10,15 @@ const ExportControl = () => {
 
     const exportCy = useCallback(async () => {
         setBusy(true);
-        let img = await cy.png({
-            //bg: 'white',
-            full: true,
-            scale: 1,
-            output: 'blob-promise',
-        });
-        saveAs(img, 'graph.png');
-        setBusy(false);
-    }, [cy, setBusy]);
+        try {
+            const img = await cy.png({ full: true, scale: 1, output: 'blob-promise' });
+            saveAs(img, 'graph.png');
+        } catch (err) {
+            console.error('Export failed:', err);
+        } finally {
+            setBusy(false);
+        }
+    }, [cy]);
 
     return (
         <>
