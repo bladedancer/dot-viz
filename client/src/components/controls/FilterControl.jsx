@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
+import { useDebouncedCallback } from 'use-debounce';
 import { useCy } from '../../hooks/useCy.js';
 import {
     useSetNodeFilter,
     useSetEdgeFilter,
-    useSetSource,
     useSettingsContext,
 } from '../../hooks/useSettings.js';
 import Toggle from '../utils/Toggle.jsx';
@@ -19,6 +19,14 @@ const FilterControl = () => {
     const { settings } = useSettingsContext();
     const { setNodeFilter } = useSetNodeFilter();
     const { setEdgeFilter } = useSetEdgeFilter();
+
+    const debouncedSetNodeFilter = useDebouncedCallback((value) => {
+        setNodeFilter({
+            filter: value,
+            connected: false,
+            direction: settings.nodeFilter.direction,
+        });
+    }, 200);
 
     useEffect(() => {
         if (!cy) {
@@ -122,13 +130,7 @@ const FilterControl = () => {
                             name="filter"
                             placeholder="Filter displayed resources"
                             value={settings.nodeFilter.filter}
-                            onChange={(e) =>
-                                setNodeFilter({
-                                    filter: e.target.value,
-                                    connected: false,
-                                    direction: settings.nodeFilter.direction,
-                                })
-                            } // Need to debounce this
+                            onChange={(e) => debouncedSetNodeFilter(e.target.value)}
                         />
                     </label>
                 </div>
