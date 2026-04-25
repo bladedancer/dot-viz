@@ -31,6 +31,7 @@
     "webpack-cli": "^4.9.1"
   },
   "dependencies": {
+    "@dagrejs/graphlib-dot": "^1.0.2",
     "@rjsf/core": "^4.2.0",
     "@zip.js/zip.js": "^2.6.65",
     "chroma-js": "^2.4.2",

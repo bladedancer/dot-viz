@@ -1,4 +1,5 @@
 import chroma from 'chroma-js';
+import * as graphlibDot from '@dagrejs/graphlib-dot';
 
 function color(index, domain) {
     return chroma(chroma.scale('Spectral').colors(domain)[index])
@@ -6,177 +7,126 @@ function color(index, domain) {
         .hex();
 }
 
-const readDot = (file) => file.text().then(parseDot);
+const parseDot = (text) => {
+    const graph = graphlibDot.read(text);
+    const nodeIds = graph.nodes();
+    const edgeDefs = graph.edges();
 
-const parseNode = (l) => {
-    const id = l.split('"')[1].trim();
-
-    let group = id.split(":")[0].trim();
-    let artifactId = id.split(":")[1].trim();
-    let packaging = id.split(":")[2].trim();
-
-    return {
-        id: group + ":" + artifactId,
-        group: group,
-        name: artifactId,
-        packaging: packaging,
-        links: [],
-        color: color(1, 10) // todo
-    };
-}
-
-const parseEdge = (l) => {
-    const link = l.split(' -> ');
-
-    const details = (e) => {
-        const data = e.split('"')[1].trim();
-        return {
-            group: data.split(":")[0],
-            name: data.split(":")[1],
-            packaging: data.split(":")[2],
-            scope: data.split(":")[3],
-        };
-    };
-
-    // Extract linkType from [style="..."] attribute as fallback
-    const styleMatch = l.match(/\[style="([^"]+)"/);
-    const styleAttr = styleMatch ? styleMatch[1] : null;
-
-    const toLink = (from, to) => {
-        const fromDetails = details(from);
-        const toDetails = details(to);
-        return {
-            source: fromDetails.group + ":" + fromDetails.name,
-            target: toDetails.group + ":" + toDetails.name,
-            linkType: toDetails.scope || styleAttr || 'compile',
-            size: 1,
-            type: 'line',
-            color: "#000000",
-            weight: 5,
-        };
-    };
-
-    return toLink(link[0].trim(), link[1].trim());
-};
-
-const nodeToGroup = (n) => {
-    return {
-        id: n.group,
-        group: n.group,
-        name: n.group,
-        links: n.links,
-        color: n.color
-    };  
-}
-
-const mergeLinks = (l, r) => {
-    let links = [...l, ...r]; // TODO REALLY MERGE AND REMOVE DUPLICATES
-    return links;
-}
-
-const parseDot = (dot) => {
-    // Completely noddy but easier than trying to integrate a parser
-    const lines = dot.split('\n');
-   
-    if (lines.length < 2) {
-        return {
-            groups: [],
-            artifacts: [],
-        };
+    if (!nodeIds.length) {
+        return { groups: [], artifacts: [] };
     }
 
-    let artifacts = {};
-    let links = [];
-    let inNodes = false;
-    let inLinks = false;
-    lines.forEach((l, i) => {
-        if (i == 0 || i == lines.length - 1) {
-            // Skip first and last line
-            return;
-        }
+    const artifacts = {};
+    nodeIds.forEach((id) => {
+        const parts = id.split(':');
+        const group = parts[0];
+        const name = parts[1] || id;
+        const packaging = parts[2] || 'jar';
+        const canonicalId = `${group}:${name}`;
 
-        if (!l.trim().length) {
-            return;
-        } else if (l.includes('// Node Definitions:')) {
-            inNodes = true;
-            inLinks = false;
-            return;
-        } else if (l.includes("// Edge Definitions:")) {
-            inNodes = false;
-            inLinks = true;
-            return;
-        }
-
-        if (inNodes) {
-            let n = parseNode(l);
-            if (!artifacts[n.id]) {
-                artifacts[n.id] = n;
-            }
-        } else if (inLinks) {
-            if (l.includes(' -> ')) {
-                links.push(parseEdge(l));
-            }
+        if (!artifacts[canonicalId]) {
+            artifacts[canonicalId] = {
+                id: canonicalId,
+                group,
+                name,
+                packaging,
+                links: [],
+                color: '#888888',
+                isRoot: true,
+            };
         }
     });
 
-    // Compose Links
-    links.forEach(l => {
-        // Avoid duplicates (not entirely right but will do)
-        if (!artifacts[l.source].links.find(t => t.target === l.target)) {
-            artifacts[l.source].links.push(l);
+    edgeDefs.forEach((edge) => {
+        const fromParts = edge.v.split(':');
+        const toParts = edge.w.split(':');
+        const sourceId = `${fromParts[0]}:${fromParts[1] || edge.v}`;
+        const targetId = `${toParts[0]}:${toParts[1] || edge.w}`;
+
+        if (sourceId === targetId) return;
+        if (!artifacts[sourceId] || !artifacts[targetId]) return;
+
+        const edgeAttrs = graph.edge(edge.v, edge.w) || {};
+        const linkType = edgeAttrs.style || edgeAttrs.label || 'compile';
+
+        const alreadyExists = artifacts[sourceId].links.some(
+            (l) => l.target === targetId && l.linkType === linkType
+        );
+        if (!alreadyExists) {
+            artifacts[sourceId].links.push({
+                source: sourceId,
+                target: targetId,
+                linkType,
+                size: 1,
+                type: 'line',
+                color: '#000000',
+                weight: 5,
+            });
         }
     });
 
-    // Extract Groups
-    let groups = Object.keys(artifacts).map(k => artifacts[k]).reduce((prev, cur) => {
-        let group = prev[cur.group];
+    const targetIds = new Set(edgeDefs.map((e) => {
+        const parts = e.w.split(':');
+        return `${parts[0]}:${parts[1] || e.w}`;
+    }));
+    Object.keys(artifacts).forEach((k) => {
+        artifacts[k].isRoot = !targetIds.has(k);
+    });
 
-        if (group != null) {
-            // Merge the links
-            group.links = mergeLinks(group.links, cur.links);
+    const groups = Object.keys(artifacts).reduce((prev, key) => {
+        const node = artifacts[key];
+        if (prev[node.group]) {
+            node.links.forEach((link) => {
+                const exists = prev[node.group].links.some(
+                    (l) => l.source === link.source && l.target === link.target && l.linkType === link.linkType
+                );
+                if (!exists) prev[node.group].links.push(link);
+            });
         } else {
-            group = nodeToGroup(cur);
-            prev[cur.group] = group;
+            prev[node.group] = {
+                id: node.group,
+                group: node.group,
+                name: node.group,
+                links: [...node.links],
+                color: '#888888',
+            };
         }
-
         return prev;
-    }, {})
-    let groupKeys = Object.keys(groups);
+    }, {});
 
-    // Add fake links between group members - to aid with clumping. 
-    groupKeys.forEach((g,i) => {
-        let groupArtifacts = Object.values(artifacts).filter(a => a.group === g);
+    const groupKeys = Object.keys(groups);
+
+    groupKeys.forEach((g) => {
+        const groupArtifacts = Object.values(artifacts).filter((a) => a.group === g);
         for (let i = 1; i < groupArtifacts.length; i++) {
-            for (let j = 0; i < groupArtifacts.length-1; i++) {
+            for (let j = 0; j < groupArtifacts.length - 1; j++) {
+                if (i === j) continue;
                 groupArtifacts[i].links.push({
-                    source: groupArtifacts[i].group + ":" + groupArtifacts[i].name,
-                    target: groupArtifacts[j].group + ":" + groupArtifacts[j].name,
-                    linkType: "grouping",
+                    source: `${groupArtifacts[i].group}:${groupArtifacts[i].name}`,
+                    target: `${groupArtifacts[j].group}:${groupArtifacts[j].name}`,
+                    linkType: 'grouping',
                     size: 1,
                     type: 'line',
-                    color:  "#FF0000",
+                    color: '#FF0000',
                     weight: 5,
                 });
             }
         }
     });
 
-    // Colorize Artifacts
-    Object.keys(artifacts).forEach(a => {
+    Object.keys(artifacts).forEach((a) => {
         artifacts[a].color = color(groupKeys.indexOf(artifacts[a].group), groupKeys.length);
     });
     groupKeys.forEach((g, i) => {
         groups[g].color = color(i, groupKeys.length);
     });
 
-    // Flatten 
-    artifacts = Object.keys(artifacts).map(k => artifacts[k]);
-    groups = Object.keys(groups).map(k => groups[k]);
-
     return {
-        groups,
-        artifacts,
+        groups: Object.values(groups),
+        artifacts: Object.values(artifacts),
     };
-}
+};
+
+const readDot = (file) => file.text().then(parseDot);
 
 export default readDot;
