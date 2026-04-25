@@ -130,4 +130,5 @@ const parseDot = (text) => {
 
 const readDot = (file) => file.text().then(parseDot);
 
+export { parseDot };
 export default readDot;
