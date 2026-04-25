@@ -6,6 +6,22 @@
     gap: 6px;
 }
 
+.pom-open-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    background: #2e3a47;
+    border: 1px solid #4a5e6e;
+    color: #a8bac8;
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    box-sizing: border-box;
+}
+
 .pom-control button {
     width: 100%;
     background: #2e3a47;

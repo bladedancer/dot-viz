@@ -25,7 +25,7 @@ const PomControl = () => {
             form.append('pom', file);
             form.append('includes', includes);
 
-            const res = await fetch('http://localhost:8080/api/generate', { method: 'POST', body: form });
+            const res = await fetch('/api/generate', { method: 'POST', body: form });
             if (!res.ok) {
                 const body = await res.json().catch(() => ({ error: res.statusText }));
                 throw new Error(body.error || res.statusText);
@@ -37,9 +37,10 @@ const PomControl = () => {
         } catch (err) {
             setError(err.message || String(err));
             setStatus(null);
+        } finally {
+            setBusy(false);
+            setLoading(false);
         }
-        setBusy(false);
-        setLoading(false);
     }, [includes, setNodeData, setLoading]);
 
     const onFileChange = useCallback((e) => {
@@ -55,12 +56,16 @@ const PomControl = () => {
 
     return (
         <div className="react-cy-control pom-control">
-            <button disabled={busy}>
-                <label htmlFor="pomFile" style={{ cursor: busy ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
-                    {busy ? <FiRefreshCw /> : <FiSettings />}
-                    Open pom.xml
-                </label>
-            </button>
+            <label
+                htmlFor={busy ? undefined : 'pomFile'}
+                className="pom-open-btn"
+                style={{ cursor: busy ? 'not-allowed' : 'pointer', opacity: busy ? 0.5 : 1 }}
+                aria-disabled={busy}
+                onClick={!busy ? onOpenClick : undefined}
+            >
+                {busy ? <FiRefreshCw /> : <FiSettings />}
+                Open pom.xml
+            </label>
             <input
                 ref={pomFile}
                 id="pomFile"
@@ -68,7 +73,6 @@ const PomControl = () => {
                 accept=".xml"
                 style={{ display: 'none' }}
                 onChange={onFileChange}
-                onClick={onOpenClick}
                 disabled={busy}
             />
 
