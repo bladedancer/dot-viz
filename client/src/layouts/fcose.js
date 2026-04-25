@@ -125,13 +125,13 @@ const fcose = {
     relativePlacementConstraint: undefined,
 
     schema: {
-        title: 'euler',
+        title: 'fcose',
         type: 'object',
         properties: {
             animate: {
                 type: 'boolean',
                 title: 'Animate',
-                default: 'true',
+                default: true,
             },
             animationDuration: {
                 type: 'number',
@@ -167,19 +167,19 @@ const fcose = {
                 type: 'boolean',
                 title: 'Randomize',
                 description: 'If false then quality must be proof.',
-                default: 'true',
+                default: true,
             },
             uniformNodeDimensions: {
                 type: 'boolean',
                 title: 'Uniform Dimensions',
-                default: 'true',
+                default: true,
             },
 
             // Spectral
             samplingType: {
                 type: 'boolean',
                 title: 'Spectral Greedy Sampling',
-                default: 'true',
+                default: true,
             },
             sampleSize: {
                 type: 'number',
@@ -239,7 +239,7 @@ const fcose = {
             tile: {
                 type: 'boolean',
                 title: 'Tile',
-                default: 'true',
+                default: true,
             },
 
             tilingCompareByFn: {

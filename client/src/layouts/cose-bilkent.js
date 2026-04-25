@@ -47,7 +47,7 @@ const coseBilkent = {
     tilingPaddingHorizontal: 10,
 
     schema: {
-        title: 'cise',
+        title: 'cose-bilkent',
         type: 'object',
         properties: {
             animateBool: {

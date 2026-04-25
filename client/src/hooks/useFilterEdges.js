@@ -14,6 +14,8 @@ export function useFilterEdges(cy, edgeFilter) {
                     edgeFilter.grouping ? e.show() : e.hide();
                 } else if (linkType === 'test') {
                     edgeFilter.test ? e.show() : e.hide();
+                } else {
+                    e.show();
                 }
             });
         });

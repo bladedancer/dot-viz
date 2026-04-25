@@ -98,8 +98,8 @@ const parseDot = (text) => {
 
     groupKeys.forEach((g) => {
         const groupArtifacts = Object.values(artifacts).filter((a) => a.group === g);
-        for (let i = 1; i < groupArtifacts.length; i++) {
-            for (let j = 0; j < groupArtifacts.length - 1; j++) {
+        for (let i = 0; i < groupArtifacts.length; i++) {
+            for (let j = 0; j < groupArtifacts.length; j++) {
                 if (i === j) continue;
                 groupArtifacts[i].links.push({
                     source: `${groupArtifacts[i].group}:${groupArtifacts[i].name}`,
@@ -114,8 +114,9 @@ const parseDot = (text) => {
         }
     });
 
+    const groupIndex = Object.fromEntries(groupKeys.map((g, i) => [g, i]));
     Object.keys(artifacts).forEach((a) => {
-        artifacts[a].color = color(groupKeys.indexOf(artifacts[a].group), groupKeys.length);
+        artifacts[a].color = color(groupIndex[artifacts[a].group], groupKeys.length);
     });
     groupKeys.forEach((g, i) => {
         groups[g].color = color(i, groupKeys.length);

@@ -83,7 +83,7 @@ const cose = {
     refresh: 20,
 
     schema: {
-        title: 'cise',
+        title: 'cose',
         type: 'object',
         properties: {
             animate: {

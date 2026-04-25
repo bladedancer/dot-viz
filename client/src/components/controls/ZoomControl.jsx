@@ -4,29 +4,10 @@ import { FiZoomIn, FiZoomOut, FiCrosshair, FiMaximize } from 'react-icons/fi';
 import { useCy } from '../../hooks/useCy';
 import { useSettingsContext } from '../../hooks/useSettings.js';
 
-/**
- * The `ZoomControl` create three UI buttons that allows the user to
- * - zoom in
- * - zoom out
- * - reset zoom (ie. see the whole graph)
- *
- * ```jsx
- * <App>
- *   <ControlsContainer>
- *     <ZoomControl />
- *   </ControlsContainer>
- * </App>
- * ```
- *
- * @category Component
- */
-const ZoomControl = ({ className, style, duration, children }) => {
+const ZoomControl = ({ className, style, duration = 200, children }) => {
     const cy = useCy();
     const { settings } = useSettingsContext();
 
-    duration = duration || 200;
-
-    // Common html props for the div wrapper
     const htmlProps = {
         style,
         className: `react-cy-control ${className || ''}`,
@@ -119,7 +100,7 @@ const ZoomControl = ({ className, style, duration, children }) => {
                     disabled={settings.selection.length === 0}
                 >
                     {children ? (
-                        children[3]
+                        children[2]
                     ) : (
                         <FiCrosshair style={{ width: '1em' }} />
                     )}
@@ -128,7 +109,7 @@ const ZoomControl = ({ className, style, duration, children }) => {
             <div {...htmlProps}>
                 <button onClick={fit} title="See whole graph">
                     {children ? (
-                        children[4]
+                        children[3]
                     ) : (
                         <FiMaximize style={{ width: '1em' }} />
                     )}

@@ -4,7 +4,7 @@ import { useSetNodeData, useSetLoading } from '../../hooks/useSettings';
 import nodify from '../../utils/nodes';
 import './dotcontrol.css';
 
-const DotControl = ({}) => {
+const DotControl = () => {
     const dotFile = useRef();
     const [busy, setBusy] = useState(false);
     const [selectedFile, setSelectedFile] = useState(null);

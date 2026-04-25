@@ -52,7 +52,7 @@ const klay = {
     },
 
     schema: {
-        title: 'euler',
+        title: 'klay',
         type: 'object',
         properties: {
             animate: {
