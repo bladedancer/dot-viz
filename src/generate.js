@@ -22,7 +22,16 @@ export async function generateDot(pomContent, includes) {
             args.push(`-Dincludes=${includes.trim()}`);
         }
 
-        await execFileAsync('mvn', args, { cwd: dir, timeout: 120000, maxBuffer: 10 * 1024 * 1024 });
+        try {
+            await execFileAsync('mvn', args, { cwd: dir, timeout: 120000, maxBuffer: 10 * 1024 * 1024 });
+        } catch (err) {
+            if (err.code === 'ENOENT') {
+                const friendly = new Error('mvn not found — ensure Maven is installed and on PATH');
+                friendly.isMvnMissing = true;
+                throw friendly;
+            }
+            throw err;
+        }
 
         const dotPath = join(dir, 'target', 'dependency-graph.dot');
         return await readFile(dotPath, 'utf8');

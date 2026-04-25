@@ -14,7 +14,12 @@ const upload = multer({
     limits: { fileSize: 1 * 1024 * 1024 },
 });
 
-app.post('/api/generate', upload.single('pom'), async (req, res) => {
+app.post('/api/generate', (req, res, next) => {
+    upload.single('pom')(req, res, (err) => {
+        if (err) return res.status(400).json({ error: err.message || String(err) });
+        next();
+    });
+}, async (req, res) => {
     if (!req.file) {
         return res.status(400).json({ error: 'No pom.xml uploaded' });
     }
@@ -25,9 +30,7 @@ app.post('/api/generate', upload.single('pom'), async (req, res) => {
         const dot = await generateDot(req.file.buffer.toString('utf8'), includes);
         res.type('text/plain').send(dot);
     } catch (err) {
-        const message = err.code === 'ENOENT'
-            ? 'mvn not found — ensure Maven is installed and on PATH'
-            : (err.stderr || err.message || String(err));
+        const message = err.stderr || err.message || String(err);
         log.error('generate failed', message);
         res.status(500).json({ error: message });
     }
