@@ -81,11 +81,3 @@ export function useSetLoading() {
         setLoading: (loading) => setSettings(prev => ({ ...prev, loading })),
     };
 }
-
-export function useBumpLayoutTrigger() {
-    const { settings, setSettings } = useSettingsContext();
-    return {
-        bumpLayoutTrigger: () =>
-            setSettings({ ...settings, layoutTrigger: (settings.layoutTrigger || 0) + 1 }),
-    };
-}
