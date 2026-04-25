@@ -3,7 +3,7 @@ import { SettingsProvider } from '../hooks/useSettings.js';
 import { CyContext } from '../hooks/useCy.js';
 import ControlsContainer from './controls/ControlsContainer.jsx';
 import ExportControl from './controls/ExportControl.jsx';
-import DotControl from './controls/DotControl.jsx';
+import PomControl from './controls/PomControl.jsx';
 import FilterControl from './controls/FilterControl.jsx';
 import LayoutControl from './controls/LayoutControl.jsx';
 import SourceControl from './controls/SourceControl.jsx';
@@ -43,7 +43,7 @@ const App = () => {
                 <Graph onCyInit={setCy} />
 
                 <ControlsContainer position={'top-left'}>
-                    <DotControl />
+                    <PomControl />
                     <SourceControl />
                     <FilterControl />
                     <ExportControl />
