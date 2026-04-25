@@ -1,3 +1,7 @@
+import { createContext, useContext } from 'react';
+
+export const CyContext = createContext(null);
+
 export function useCy() {
-    return window.cy;
+    return useContext(CyContext);
 }

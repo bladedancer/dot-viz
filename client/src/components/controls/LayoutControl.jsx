@@ -17,8 +17,6 @@ import cise from 'cytoscape-cise';
 import klay from 'cytoscape-klay';
 import euler from 'cytoscape-euler';
 import Button from '../utils/Button.jsx';
-import { async } from 'regenerator-runtime';
-import e from 'cors';
 
 Cytoscape.use(euler);
 Cytoscape.use(klay);

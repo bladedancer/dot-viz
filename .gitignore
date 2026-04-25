@@ -2,3 +2,5 @@
 node_modules
 store/*.fed
 dot/*
+test-results/
+playwright-report/

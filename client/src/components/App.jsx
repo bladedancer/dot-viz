@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { SettingsProvider } from '../hooks/useSettings.js';
+import { CyContext } from '../hooks/useCy.js';
 import ControlsContainer from './controls/ControlsContainer.jsx';
 import ExportControl from './controls/ExportControl.jsx';
 import DotControl from './controls/DotControl.jsx';
@@ -10,6 +11,7 @@ import ZoomControl from './controls/ZoomControl.jsx';
 import Graph from './Graph.jsx';
 
 const App = () => {
+    const [cy, setCy] = useState(null);
     const [settings, setSettings] = useState({
         contentModifiedTS: 0,
         fed: null,
@@ -37,18 +39,20 @@ const App = () => {
 
     return (
         <SettingsProvider value={context}>
-            <Graph />
+            <CyContext.Provider value={cy}>
+                <Graph onCyInit={setCy} />
 
-            <ControlsContainer position={'top-left'}>
-                <DotControl />
-                <SourceControl />
-                <FilterControl />
-                <ExportControl />
-            </ControlsContainer>
-            <ControlsContainer position={'bottom-right'}>
-                <ZoomControl />
-                <LayoutControl />
-            </ControlsContainer>
+                <ControlsContainer position={'top-left'}>
+                    <DotControl />
+                    <SourceControl />
+                    <FilterControl />
+                    <ExportControl />
+                </ControlsContainer>
+                <ControlsContainer position={'bottom-right'}>
+                    <ZoomControl />
+                    <LayoutControl />
+                </ControlsContainer>
+            </CyContext.Provider>
         </SettingsProvider>
     );
 };

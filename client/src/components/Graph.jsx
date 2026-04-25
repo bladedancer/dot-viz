@@ -1,13 +1,12 @@
-import React, { useState, useLayoutEffect, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import CytoscapeComponent from 'react-cytoscapejs';
 import { useSetSelection, useSettingsContext } from '../hooks/useSettings.js';
-import { useCy } from '../hooks/useCy';
 
-const Graph = ({ children }) => {
+const Graph = ({ onCyInit }) => {
     const [elements, setElements] = useState([]);
     const { settings } = useSettingsContext();
     const { setSelection } = useSetSelection();
-    const cy = useCy();
+    const cyRef = useRef(null);
 
     // Convert to elements
     useEffect(() => {
@@ -51,7 +50,7 @@ const Graph = ({ children }) => {
                         target: l.target,
                         label: l.label,
                         sourceColor: col.source,
-                        targetColor: col.target, 
+                        targetColor: col.target,
                         gradient: `${col.source} ${col.target}`,
                         linkType: l.linkType,
                         isHard: l.isHard
@@ -143,24 +142,23 @@ const Graph = ({ children }) => {
         setSel.current = setSelection;
     }, [setSelection]);
 
-    useEffect(() => {
-        if (!cy) {
-            return;
-        }
-        cy.on('select', () => {
-            setSel.current(cy.nodes().filter(':selected'));
-        });
-        cy.on('unselect', () => {
-            setSel.current(cy.nodes().filter(':selected'));
-        });
-        cy.on('boxselect', () => {
-            setSel.current(cy.nodes().filter(':selected'));
-        });
-    }, [cy]);
-
     return (
         <CytoscapeComponent
-            global="cy"
+            cy={(instance) => {
+                if (cyRef.current !== instance) {
+                    cyRef.current = instance;
+                    instance.on('select', () => {
+                        setSel.current(instance.nodes().filter(':selected'));
+                    });
+                    instance.on('unselect', () => {
+                        setSel.current(instance.nodes().filter(':selected'));
+                    });
+                    instance.on('boxselect', () => {
+                        setSel.current(instance.nodes().filter(':selected'));
+                    });
+                    if (onCyInit) onCyInit(instance);
+                }
+            }}
             elements={elements}
             style={{ top: 0, bottom: 0, position: 'absolute', width: '100%' }}
             stylesheet={cytoscapeStylesheet}
