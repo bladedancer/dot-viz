@@ -1,16 +1,15 @@
 import { execFile } from 'child_process';
 import { promisify } from 'util';
-import { mkdir, writeFile, readFile, rm } from 'fs/promises';
+import { mkdtemp, writeFile, readFile, rm } from 'fs/promises';
 import { join } from 'path';
 import { tmpdir } from 'os';
 
 const execFileAsync = promisify(execFile);
 
 export async function generateDot(pomContent, includes) {
-    const dir = join(tmpdir(), `dot-viz-${Date.now()}`);
+    const dir = await mkdtemp(join(tmpdir(), 'dot-viz-'));
     try {
-        await mkdir(dir, { recursive: true });
-        await writeFile(join(dir, 'pom.xml'), pomContent);
+        await writeFile(join(dir, 'pom.xml'), pomContent, 'utf8');
 
         const args = [
             'com.github.ferstl:depgraph-maven-plugin:aggregate',
@@ -23,7 +22,7 @@ export async function generateDot(pomContent, includes) {
             args.push(`-Dincludes=${includes.trim()}`);
         }
 
-        await execFileAsync('mvn', args, { cwd: dir, timeout: 120000 });
+        await execFileAsync('mvn', args, { cwd: dir, timeout: 120000, maxBuffer: 10 * 1024 * 1024 });
 
         const dotPath = join(dir, 'target', 'dependency-graph.dot');
         return await readFile(dotPath, 'utf8');
