@@ -1,6 +1,6 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo } from 'react';
 import { SettingsProvider } from '../hooks/useSettings.js';
-import { CytoscapeProvider, useCyState } from '../hooks/useCy.js';
+import { CyContext } from '../hooks/useCy.js';
 import ControlsContainer from './controls/ControlsContainer.jsx';
 import ExportControl from './controls/ExportControl.jsx';
 import DotControl from './controls/DotControl.jsx';
@@ -11,17 +11,18 @@ import ZoomControl from './controls/ZoomControl.jsx';
 import Graph from './Graph.jsx';
 
 const App = () => {
+    const [cy, setCy] = useState(null);
     const [settings, setSettings] = useState({
         contentModifiedTS: 0,
         fed: null,
         source: 'artifacts',
         selection: [],
-        layoutTrigger: 0,
-        loading: false,
+
         nodeData: {
             groups: [],
             artifacts: [],
         },
+
         nodeFilter: {
             filter: '',
             connected: false,
@@ -30,19 +31,17 @@ const App = () => {
         edgeFilter: {
             compile: true,
             provided: true,
-            test: true,
-            grouping: true,
+            test: false,
+            grouping: true
         },
     });
-    const [cy, setCy] = useCyState();
-
-    const settingsContext = useMemo(() => ({ settings, setSettings }), [settings]);
-    const handleCyInit = useCallback((instance) => setCy(instance), [setCy]);
+    const context = useMemo(() => ({ settings, setSettings }), [settings]);
 
     return (
-        <SettingsProvider value={settingsContext}>
-            <CytoscapeProvider value={cy}>
-                <Graph onCyInit={handleCyInit} />
+        <SettingsProvider value={context}>
+            <CyContext.Provider value={cy}>
+                <Graph onCyInit={setCy} />
+
                 <ControlsContainer position={'top-left'}>
                     <DotControl />
                     <SourceControl />
@@ -51,9 +50,9 @@ const App = () => {
                 </ControlsContainer>
                 <ControlsContainer position={'bottom-right'}>
                     <ZoomControl />
-                    <LayoutControl layoutTrigger={settings.layoutTrigger} />
+                    <LayoutControl />
                 </ControlsContainer>
-            </CytoscapeProvider>
+            </CyContext.Provider>
         </SettingsProvider>
     );
 };

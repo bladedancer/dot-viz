@@ -1,13 +1,7 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext } from 'react';
 
-const CytoscapeContext = createContext(null);
-
-export const CytoscapeProvider = CytoscapeContext.Provider;
+export const CyContext = createContext(null);
 
 export function useCy() {
-    return useContext(CytoscapeContext);
-}
-
-export function useCyState() {
-    return useState(null);
+    return useContext(CyContext);
 }

@@ -8,9 +8,9 @@ export default defineConfig({
         headless: true,
     },
     webServer: {
-        command: 'npm start',
+        command: 'npm run build && npm start',
         url: 'http://localhost:8080',
         reuseExistingServer: !process.env.CI,
-        timeout: 15000,
+        timeout: 30000,
     },
 });
