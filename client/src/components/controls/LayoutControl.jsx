@@ -17,8 +17,6 @@ import cise from 'cytoscape-cise';
 import klay from 'cytoscape-klay';
 import euler from 'cytoscape-euler';
 import Button from '../utils/Button.jsx';
-import { async } from 'regenerator-runtime';
-import e from 'cors';
 
 Cytoscape.use(euler);
 Cytoscape.use(klay);
@@ -1795,7 +1793,7 @@ const LayoutControl = ({ className, style, children, layoutTrigger }) => {
         }
 
         lay.run();
-    }, [cy, layout, activeLayout, setActiveLayout]);
+    }, [cy, layout, activeLayout, setActiveLayout, layouts]);
 
     const stopLayout = useCallback(() => {
         activeLayout && activeLayout.stop();
@@ -1807,6 +1805,7 @@ const LayoutControl = ({ className, style, children, layoutTrigger }) => {
         if (!cy) {
             return;
         }
+        stopLayout();
         runLayout();
     }, [cy, layout]);
 
@@ -1815,11 +1814,10 @@ const LayoutControl = ({ className, style, children, layoutTrigger }) => {
         if (!activeLayout) {
             return;
         }
-        const layout = activeLayout;
-        layout.pon('layoutstop').then(() => {
-            // Only clear if this layout is still the active one; runLayout may have
-            // already replaced it with a new layout before this promise resolved.
-            setActiveLayout(prev => prev === layout ? null : prev);
+        const current = activeLayout;
+        current.pon('layoutstop').then(() => {
+            current.stop();
+            setActiveLayout(prev => prev === current ? null : prev);
         });
     }, [activeLayout]);
 
@@ -1832,7 +1830,7 @@ const LayoutControl = ({ className, style, children, layoutTrigger }) => {
         }
     }, [layoutConfigOpened, layoutOverrides]);
 
-    // Re-run layout after new elements are committed to Cytoscape
+    // Rerun layout when triggered externally (e.g. after new data loads)
     useEffect(() => {
         if (!cy || !layoutTrigger) return;
         runLayout();

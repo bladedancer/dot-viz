@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { SettingsProvider } from '../hooks/useSettings.js';
+import { CytoscapeProvider, useCyState } from '../hooks/useCy.js';
 import ControlsContainer from './controls/ControlsContainer.jsx';
 import ExportControl from './controls/ExportControl.jsx';
 import DotControl from './controls/DotControl.jsx';
@@ -17,12 +18,10 @@ const App = () => {
         selection: [],
         layoutTrigger: 0,
         loading: false,
-
         nodeData: {
             groups: [],
             artifacts: [],
         },
-
         nodeFilter: {
             filter: '',
             connected: false,
@@ -31,26 +30,30 @@ const App = () => {
         edgeFilter: {
             compile: true,
             provided: true,
-            test: false,
-            grouping: true
+            test: true,
+            grouping: true,
         },
     });
-    const context = useMemo(() => ({ settings, setSettings }), [settings]);
+    const [cy, setCy] = useCyState();
+
+    const settingsContext = useMemo(() => ({ settings, setSettings }), [settings]);
+    const handleCyInit = useCallback((instance) => setCy(instance), [setCy]);
 
     return (
-        <SettingsProvider value={context}>
-            <Graph />
-
-            <ControlsContainer position={'top-left'}>
-                <DotControl />
-                <SourceControl />
-                <FilterControl />
-                <ExportControl />
-            </ControlsContainer>
-            <ControlsContainer position={'bottom-right'}>
-                <ZoomControl />
-                <LayoutControl layoutTrigger={settings.layoutTrigger} />
-            </ControlsContainer>
+        <SettingsProvider value={settingsContext}>
+            <CytoscapeProvider value={cy}>
+                <Graph onCyInit={handleCyInit} />
+                <ControlsContainer position={'top-left'}>
+                    <DotControl />
+                    <SourceControl />
+                    <FilterControl />
+                    <ExportControl />
+                </ControlsContainer>
+                <ControlsContainer position={'bottom-right'}>
+                    <ZoomControl />
+                    <LayoutControl layoutTrigger={settings.layoutTrigger} />
+                </ControlsContainer>
+            </CytoscapeProvider>
         </SettingsProvider>
     );
 };

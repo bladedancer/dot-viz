@@ -1,9 +1,9 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useEffect } from 'react';
+import { useDebouncedCallback } from 'use-debounce';
 import { useCy } from '../../hooks/useCy.js';
 import {
     useSetNodeFilter,
     useSetEdgeFilter,
-    useSetSource,
     useSettingsContext,
 } from '../../hooks/useSettings.js';
 import Toggle from '../utils/Toggle.jsx';
@@ -19,18 +19,14 @@ const FilterControl = () => {
     const { settings } = useSettingsContext();
     const { setNodeFilter } = useSetNodeFilter();
     const { setEdgeFilter } = useSetEdgeFilter();
-    const debounceTimer = useRef(null);
 
-    const debouncedSetNodeFilter = useCallback((value) => {
-        clearTimeout(debounceTimer.current);
-        debounceTimer.current = setTimeout(() => {
-            setNodeFilter({
-                filter: value,
-                connected: false,
-                direction: settings.nodeFilter.direction,
-            });
-        }, 200);
-    }, [setNodeFilter, settings.nodeFilter.direction]);
+    const debouncedSetNodeFilter = useDebouncedCallback((value) => {
+        setNodeFilter({
+            filter: value,
+            connected: false,
+            direction: settings.nodeFilter.direction,
+        });
+    }, 200);
 
     useEffect(() => {
         if (!cy) {

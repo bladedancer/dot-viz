@@ -6,20 +6,7 @@ function color(index, domain) {
         .hex();
 }
 
-const readDot = (dotfile) => {
-    return new Promise((resolve, reject) => {
-        var fr = new FileReader();  
-        fr.onload = () => {
-            try {
-                resolve(parseDot(fr.result));
-            } catch (err) {
-                reject(err);
-            }
-        };
-        fr.onerror = reject;
-        fr.readAsText(dotfile);
-      });
-}
+const readDot = (file) => file.text().then(parseDot);
 
 const parseNode = (l) => {
     const id = l.split('"')[1].trim();
@@ -40,32 +27,37 @@ const parseNode = (l) => {
 
 const parseEdge = (l) => {
     const link = l.split(' -> ');
-    
+
     const details = (e) => {
         const data = e.split('"')[1].trim();
         return {
             group: data.split(":")[0],
             name: data.split(":")[1],
             packaging: data.split(":")[2],
-            scope: data.split(":")[3] 
+            scope: data.split(":")[3],
         };
-    }
+    };
+
+    // Extract linkType from [style="..."] attribute as fallback
+    const styleMatch = l.match(/\[style="([^"]+)"/);
+    const styleAttr = styleMatch ? styleMatch[1] : null;
+
     const toLink = (from, to) => {
-        let fromDetails = details(from);
-        let toDetails = details(to);
+        const fromDetails = details(from);
+        const toDetails = details(to);
         return {
             source: fromDetails.group + ":" + fromDetails.name,
             target: toDetails.group + ":" + toDetails.name,
-            linkType: toDetails.scope,
+            linkType: toDetails.scope || styleAttr || 'compile',
             size: 1,
             type: 'line',
-            color:  "#000000",
+            color: "#000000",
             weight: 5,
         };
     };
 
-    return toLink(link[0].trim(), link[1].trim())
-}
+    return toLink(link[0].trim(), link[1].trim());
+};
 
 const nodeToGroup = (n) => {
     return {
@@ -78,13 +70,8 @@ const nodeToGroup = (n) => {
 }
 
 const mergeLinks = (l, r) => {
-    const merged = [...l];
-    r.forEach(link => {
-        if (!merged.find(t => t.source === link.source && t.target === link.target && t.linkType === link.linkType)) {
-            merged.push(link);
-        }
-    });
-    return merged;
+    let links = [...l, ...r]; // TODO REALLY MERGE AND REMOVE DUPLICATES
+    return links;
 }
 
 const parseDot = (dot) => {
@@ -126,24 +113,18 @@ const parseDot = (dot) => {
                 artifacts[n.id] = n;
             }
         } else if (inLinks) {
-            links.push(parseEdge(l));
+            if (l.includes(' -> ')) {
+                links.push(parseEdge(l));
+            }
         }
     });
 
     // Compose Links
     links.forEach(l => {
-        // Skip self-loops (can arise from classifier variants normalising to the same 2-part id)
-        if (l.source === l.target) return;
-        if (!artifacts[l.source]) return;
-        if (!artifacts[l.source].links.find(t => t.target === l.target && t.linkType === l.linkType)) {
+        // Avoid duplicates (not entirely right but will do)
+        if (!artifacts[l.source].links.find(t => t.target === l.target)) {
             artifacts[l.source].links.push(l);
         }
-    });
-
-    // Mark root nodes (nodes with no incoming edges)
-    const targetIds = new Set(links.map(l => l.target));
-    Object.keys(artifacts).forEach(k => {
-        artifacts[k].isRoot = !targetIds.has(k);
     });
 
     // Extract Groups
@@ -162,12 +143,11 @@ const parseDot = (dot) => {
     }, {})
     let groupKeys = Object.keys(groups);
 
-    // Add fake links between group members - to aid with clumping.
-    groupKeys.forEach((g) => {
+    // Add fake links between group members - to aid with clumping. 
+    groupKeys.forEach((g,i) => {
         let groupArtifacts = Object.values(artifacts).filter(a => a.group === g);
         for (let i = 1; i < groupArtifacts.length; i++) {
-            for (let j = 0; j < groupArtifacts.length - 1; j++) {
-                if (i === j) continue;
+            for (let j = 0; i < groupArtifacts.length-1; i++) {
                 groupArtifacts[i].links.push({
                     source: groupArtifacts[i].group + ":" + groupArtifacts[i].name,
                     target: groupArtifacts[j].group + ":" + groupArtifacts[j].name,
@@ -199,9 +179,4 @@ const parseDot = (dot) => {
     };
 }
 
-const nodify = async (dotfile) => {
-    const dotData = await readDot(dotfile);
-    return dotData;
-};
-
-export default nodify;
+export default readDot;
