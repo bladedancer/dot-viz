@@ -1,5 +1,6 @@
 #.env
 node_modules
+.worktrees
 store/*.fed
 dot/*
 test-results/
