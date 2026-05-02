@@ -256,3 +256,78 @@ div.sigma-container {
 
 /* ── Spinner inline ──────────────────────────────────────────────────────── */
 .spin { display: inline-block; animation: spin 0.7s linear infinite; }
+
+/* ── Layout popover ──────────────────────────────────────────────────────── */
+.layout-popover {
+    position: absolute;
+    bottom: 100%;
+    right: 0;
+    margin-bottom: 8px;
+    width: 210px;
+    background: var(--bg1);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    z-index: 200;
+}
+
+.popover-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.popover-label {
+    color: var(--text-dim);
+    font-size: 11px;
+    flex: 1;
+    white-space: nowrap;
+}
+
+.popover-slider {
+    flex: 1;
+    accent-color: var(--accent);
+    cursor: pointer;
+}
+
+.popover-value {
+    color: var(--text);
+    font-size: 11px;
+    width: 32px;
+    text-align: right;
+    flex-shrink: 0;
+    font-variant-numeric: tabular-nums;
+}
+
+.popover-select {
+    flex: 1;
+    background: var(--bg0);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-size: 11px;
+    padding: 3px 6px;
+}
+
+.popover-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-dim);
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+}
+
+.popover-reset {
+    font-size: 10px;
+    color: var(--accent);
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    text-decoration: underline;
+    align-self: flex-end;
+}
