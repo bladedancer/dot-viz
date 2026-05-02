@@ -76,6 +76,8 @@ export function buildGraph(nodeData) {
             if (edgeIds.has(edgeId)) continue;
             edgeIds.add(edgeId);
             if (!graph.hasNode(link.source) || !graph.hasNode(link.target)) continue;
+            // In a simple directed graph, skip if an edge already exists between these nodes
+            if (graph.hasDirectedEdge(link.source, link.target)) continue;
             graph.addEdgeWithKey(edgeId, link.source, link.target, {
                 linkType: link.linkType,
             });
