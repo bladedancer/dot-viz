@@ -8,6 +8,22 @@ const initialState = {
     nodeFilter: { text: '', connected: false, direction: 'both' },
     edgeFilter: { compile: true, provided: true, test: false, grouping: true },
     selection: [],
+    layoutSettings: {
+        force: {
+            gravity:       1,
+            scalingRatio:  10,
+            slowDown:      null,
+            timeoutMs:     15000,
+            linLogMode:    false,
+            strongGravity: false,
+        },
+        dagre: {
+            rankdir: 'LR',
+            nodesep: 80,
+            ranksep: 200,
+            ranker:  'network-simplex',
+        },
+    },
 };
 
 function reducer(state, action) {
@@ -24,6 +40,14 @@ function reducer(state, action) {
             return { ...state, edgeFilter: { ...state.edgeFilter, ...action.edgeFilter } };
         case 'SET_SELECTION':
             return { ...state, selection: action.selection };
+        case 'SET_LAYOUT_SETTINGS':
+            return {
+                ...state,
+                layoutSettings: {
+                    force: { ...state.layoutSettings.force, ...(action.force || {}) },
+                    dagre: { ...state.layoutSettings.dagre, ...(action.dagre || {}) },
+                },
+            };
         default:
             return state;
     }
