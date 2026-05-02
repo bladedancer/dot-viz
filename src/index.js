@@ -5,7 +5,7 @@ import multer from 'multer';
 import { readFile } from 'fs/promises';
 import { dirname, join } from 'path';
 import { log } from './log.js';
-import { generateDot, generateDotFromPath } from './generate.js';
+import { generateDot, generateDotFromPath, filterDotByGroup } from './generate.js';
 
 const app = express();
 app.use(cors());
@@ -42,12 +42,12 @@ app.post('/api/generate', (req, res, next) => {
 
 // Path-based load: reads an already-generated dependency-graph.dot
 app.post('/api/load-path', async (req, res) => {
-    const { pomPath } = req.body || {};
+    const { pomPath, groupFilter } = req.body || {};
     if (!pomPath) return res.status(400).json({ error: 'pomPath is required' });
     const dotPath = join(dirname(pomPath), 'target', 'dependency-graph.dot');
     try {
         const dot = await readFile(dotPath, 'utf8');
-        res.type('text/plain').send(dot);
+        res.type('text/plain').send(filterDotByGroup(dot, groupFilter || ''));
     } catch (err) {
         if (err.code === 'ENOENT') {
             return res.status(500).json({ error: `Could not read ${dotPath}: ${err.message}` });
@@ -59,10 +59,10 @@ app.post('/api/load-path', async (req, res) => {
 
 // Path-based generate: runs mvn in the pom's directory
 app.post('/api/generate-path', async (req, res) => {
-    const { pomPath, includes } = req.body || {};
+    const { pomPath, groupFilter } = req.body || {};
     if (!pomPath) return res.status(400).json({ error: 'pomPath is required' });
     try {
-        const dot = await generateDotFromPath(pomPath, includes || '');
+        const dot = await generateDotFromPath(pomPath, groupFilter || '');
         res.type('text/plain').send(dot);
     } catch (err) {
         const message = err.stderr || err.message || String(err);
