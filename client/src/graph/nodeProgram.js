@@ -1,7 +1,22 @@
-import { NodeProgram, floatColor, drawDiscNodeHover } from 'sigma/rendering';
+import { NodeProgram } from 'sigma/rendering';
 
 const FLOAT = WebGLRenderingContext.FLOAT;
 const UNSIGNED_BYTE = WebGLRenderingContext.UNSIGNED_BYTE;
+
+// floatColor is not a public sigma/rendering export — re-implement the same packing
+const _int8 = new Int8Array(4);
+const _int32 = new Int32Array(_int8.buffer, 0, 1);
+const _float32 = new Float32Array(_int8.buffer, 0, 1);
+function floatColor(hex) {
+    let r = 0, g = 0, b = 0;
+    if (hex && hex[0] === '#') {
+        r = parseInt(hex.slice(1, 3), 16);
+        g = parseInt(hex.slice(3, 5), 16);
+        b = parseInt(hex.slice(5, 7), 16);
+    }
+    _int32[0] = (0xfe << 24) | (b << 16) | (g << 8) | r; // alpha=254 masking
+    return _float32[0];
+}
 
 const VERT = /* glsl */`
 attribute vec2 a_position;
