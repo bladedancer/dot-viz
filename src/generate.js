@@ -9,7 +9,7 @@ const execFileAsync = promisify(execFile);
 export function filterDotByGroup(dotText, groupFilter) {
     const prefixes = (groupFilter || '')
         .split(',')
-        .map((s) => s.trim())
+        .map((s) => s.trim().replace(/\*+$/, ''))
         .filter(Boolean);
     if (!prefixes.length) return dotText;
 
