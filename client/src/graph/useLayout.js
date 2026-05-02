@@ -3,8 +3,6 @@ import FA2Layout from 'graphology-layout-forceatlas2/worker';
 import forceAtlas2 from 'graphology-layout-forceatlas2';
 import dagre from '@dagrejs/dagre';
 
-const FA2_TIMEOUT_MS = 15000;
-
 function stopSupervisor(supervisorRef, timerRef) {
     if (timerRef.current) {
         clearTimeout(timerRef.current);
@@ -16,10 +14,15 @@ function stopSupervisor(supervisorRef, timerRef) {
     }
 }
 
-function runDagre(graph, sigma) {
+function runDagre(graph, sigma, dagreSettings) {
     try {
         const g = new dagre.graphlib.Graph();
-        g.setGraph({ rankdir: 'LR', nodesep: 80, ranksep: 200 });
+        g.setGraph({
+            rankdir: dagreSettings.rankdir,
+            nodesep: dagreSettings.nodesep,
+            ranksep: dagreSettings.ranksep,
+            ranker:  dagreSettings.ranker,
+        });
         g.setDefaultEdgeLabel(() => ({}));
 
         graph.forEachNode((id, attrs) => {
@@ -38,8 +41,6 @@ function runDagre(graph, sigma) {
                 graph.setNodeAttribute(id, 'y', pos.y);
             }
         });
-        // refresh() triggers re-normalization; wait one frame before resetting camera
-        // so sigma's normalization is current before animatedReset maps to it
         sigma.refresh();
         requestAnimationFrame(() => sigma.getCamera().animatedReset({ duration: 200 }));
     } catch (err) {
@@ -47,7 +48,7 @@ function runDagre(graph, sigma) {
     }
 }
 
-function startFA2(graph, sigma, supervisorRef, timerRef) {
+function startFA2(graph, sigma, supervisorRef, timerRef, forceSettings) {
     stopSupervisor(supervisorRef, timerRef);
     if (!graph.order) return;
 
@@ -56,9 +57,11 @@ function startFA2(graph, sigma, supervisorRef, timerRef) {
         settings: {
             ...inferred,
             barnesHutOptimize: graph.order > 200,
-            gravity: 1,
-            scalingRatio: 10,
-            slowDown: Math.max(1, Math.log(graph.order)),
+            gravity:           forceSettings.gravity,
+            scalingRatio:      forceSettings.scalingRatio,
+            slowDown:          forceSettings.slowDown ?? Math.max(1, Math.log(graph.order)),
+            linLogMode:        forceSettings.linLogMode,
+            strongGravityMode: forceSettings.strongGravity,
         },
     });
     supervisorRef.current = supervisor;
@@ -72,50 +75,53 @@ function startFA2(graph, sigma, supervisorRef, timerRef) {
             sigma.refresh();
             requestAnimationFrame(() => sigma.getCamera().animatedReset({ duration: 400 }));
         }
-    }, FA2_TIMEOUT_MS);
+    }, forceSettings.timeoutMs);
 }
 
-export function useLayout(sigma, graph, graphVersion) {
+export function useLayout(sigma, graph, graphVersion, layoutSettings) {
     const supervisorRef = useRef(null);
     const timerRef      = useRef(null);
     const [layoutMode, setLayoutMode] = useState('force');
     const layoutModeRef = useRef(layoutMode);
     useEffect(() => { layoutModeRef.current = layoutMode; }, [layoutMode]);
 
+    const layoutSettingsRef = useRef(layoutSettings);
+    useEffect(() => { layoutSettingsRef.current = layoutSettings; }, [layoutSettings]);
+
     const runLayout = useRef(() => {
         if (!sigma || !graph || !graph.order) return;
+        const s = layoutSettingsRef.current;
         if (layoutModeRef.current === 'hierarchy') {
             stopSupervisor(supervisorRef, timerRef);
-            runDagre(graph, sigma);
+            runDagre(graph, sigma, s.dagre);
         } else {
-            startFA2(graph, sigma, supervisorRef, timerRef);
+            startFA2(graph, sigma, supervisorRef, timerRef, s.force);
         }
     });
 
-    // Run layout whenever graph or mode changes
     useEffect(() => {
         if (!sigma || !graph || !graph.order) return;
 
         if (layoutMode === 'hierarchy') {
             stopSupervisor(supervisorRef, timerRef);
-            runDagre(graph, sigma);
+            runDagre(graph, sigma, layoutSettings.dagre);
         } else {
-            startFA2(graph, sigma, supervisorRef, timerRef);
+            startFA2(graph, sigma, supervisorRef, timerRef, layoutSettings.force);
         }
 
         return () => stopSupervisor(supervisorRef, timerRef);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [sigma, graph, graphVersion, layoutMode]);
+    }, [sigma, graph, graphVersion, layoutMode, layoutSettings]);
 
-    // Keep runLayout ref pointing to fresh graph/sigma
     useEffect(() => {
         runLayout.current = () => {
             if (!sigma || !graph || !graph.order) return;
+            const s = layoutSettingsRef.current;
             if (layoutModeRef.current === 'hierarchy') {
                 stopSupervisor(supervisorRef, timerRef);
-                runDagre(graph, sigma);
+                runDagre(graph, sigma, s.dagre);
             } else {
-                startFA2(graph, sigma, supervisorRef, timerRef);
+                startFA2(graph, sigma, supervisorRef, timerRef, s.force);
             }
         };
     }, [sigma, graph]);
