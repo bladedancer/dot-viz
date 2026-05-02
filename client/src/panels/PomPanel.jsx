@@ -5,8 +5,8 @@ import { parseDot } from '../graph/parseDot.js';
 const PomPanel = () => {
     const { dispatch } = useStore();
     const [pomPath, setPomPath] = useState('');
-    const [includesEnabled, setIncludesEnabled] = useState(false);
-    const [includes, setIncludes] = useState('');
+    const [groupFilterEnabled, setGroupFilterEnabled] = useState(false);
+    const [groupFilter, setGroupFilter] = useState('');
     const [busy, setBusy] = useState(false);
     const [status, setStatus] = useState(null);
     const [error, setError] = useState(null);
@@ -17,12 +17,12 @@ const PomPanel = () => {
         setError(null);
         setStatus(statusMsg);
         dispatch({ type: 'SET_LOADING', loading: true });
-        const effectiveIncludes = includesEnabled ? includes.trim() : '';
+        const effectiveGroupFilter = groupFilterEnabled ? groupFilter.trim() : '';
         try {
             const res = await fetch(endpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ pomPath: pomPath.trim(), includes: effectiveIncludes }),
+                body: JSON.stringify({ pomPath: pomPath.trim(), groupFilter: effectiveGroupFilter }),
             });
             if (!res.ok) {
                 const body = await res.json().catch(() => ({ error: res.statusText }));
@@ -38,7 +38,7 @@ const PomPanel = () => {
             setBusy(false);
             dispatch({ type: 'SET_LOADING', loading: false });
         }
-    }, [pomPath, includes, includesEnabled, dispatch]);
+    }, [pomPath, groupFilter, groupFilterEnabled, dispatch]);
 
     const load     = useCallback(() => callApi('/api/load-path',     'Loading dependency-graph.dot…'), [callApi]);
     const generate = useCallback(() => callApi('/api/generate-path', 'Running mvn depgraph:aggregate…'), [callApi]);
@@ -59,20 +59,20 @@ const PomPanel = () => {
             <label className="checkbox-label">
                 <input
                     type="checkbox"
-                    checked={includesEnabled}
-                    onChange={(e) => setIncludesEnabled(e.target.checked)}
+                    checked={groupFilterEnabled}
+                    onChange={(e) => setGroupFilterEnabled(e.target.checked)}
                     disabled={busy}
                 />
-                Includes filter
+                Group filter
             </label>
 
-            {includesEnabled && (
+            {groupFilterEnabled && (
                 <input
                     className="path-input"
                     type="text"
-                    value={includes}
-                    onChange={(e) => setIncludes(e.target.value)}
-                    placeholder="com.example*"
+                    value={groupFilter}
+                    onChange={(e) => setGroupFilter(e.target.value)}
+                    placeholder="com.example,org.other"
                     disabled={busy}
                     onKeyDown={(e) => e.key === 'Enter' && canAct && load()}
                 />
