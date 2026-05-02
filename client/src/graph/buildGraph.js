@@ -19,7 +19,7 @@ function measureLabel(text) {
 function seedWithDagre(graph) {
     try {
         const g = new dagre.graphlib.Graph();
-        g.setGraph({ rankdir: 'TB', nodesep: 60, ranksep: 100 });
+        g.setGraph({ rankdir: 'TB', nodesep: 60, ranksep: 100 }); // TB for seed; interactive hierarchy mode uses LR
         g.setDefaultEdgeLabel(() => ({}));
 
         graph.forEachNode((id, attrs) => {
