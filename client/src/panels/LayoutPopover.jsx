@@ -96,19 +96,13 @@ export default function LayoutPopover({ mode, onClose }) {
                         min={1} max={50} step={1}
                         onChange={(v) => setForce({ scalingRatio: v })}
                     />
-                    <div className="popover-row">
-                        <span className="popover-label">Slow down</span>
-                        <input
-                            type="range"
-                            className="popover-slider"
-                            min={1} max={20} step={0.5}
-                            value={force.slowDown ?? 1}
-                            onChange={(e) => setForce({ slowDown: Number(e.target.value) })}
-                        />
-                        <span className="popover-value">
-                            {force.slowDown == null ? 'auto' : force.slowDown}
-                        </span>
-                    </div>
+                    <SliderRow
+                        label="Slow down"
+                        value={force.slowDown ?? 1}
+                        min={1} max={20} step={0.5}
+                        display={force.slowDown == null ? 'auto' : force.slowDown}
+                        onChange={(v) => setForce({ slowDown: v })}
+                    />
                     {force.slowDown != null && (
                         <button className="popover-reset" onClick={() => setForce({ slowDown: null })}>
                             reset to auto
@@ -118,6 +112,7 @@ export default function LayoutPopover({ mode, onClose }) {
                         label="Timeout (s)"
                         value={force.timeoutMs / 1000}
                         min={5} max={60} step={5}
+                        display={`${force.timeoutMs / 1000}s`}
                         onChange={(v) => setForce({ timeoutMs: v * 1000 })}
                     />
                     <CheckRow
