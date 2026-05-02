@@ -3,6 +3,7 @@ import { promisify } from 'util';
 import { mkdtemp, writeFile, readFile, rm } from 'fs/promises';
 import { join } from 'path';
 import { tmpdir } from 'os';
+import { log } from './log.js';
 
 const execFileAsync = promisify(execFile);
 
@@ -30,6 +31,7 @@ export async function generateDot(pomContent, includes) {
                 friendly.isMvnMissing = true;
                 throw friendly;
             }
+            log.error('mvn execution failed', err.message || String(err));
             throw err;
         }
 
