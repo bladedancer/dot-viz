@@ -1,0 +1,247 @@
+/* ── Reset & base ─────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body, #root {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    background: #0d1117;
+    color: #c9d1d9;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 13px;
+}
+
+/* ── Design tokens ────────────────────────────────────────────────────────── */
+:root {
+    --bg0:      #0d1117;
+    --bg1:      #161b22;
+    --bg2:      #21262d;
+    --bg3:      #30363d;
+    --border:   #30363d;
+    --text:     #c9d1d9;
+    --text-dim: #8b949e;
+    --accent:   #388bfd;
+    --accent-bg:#1f4080;
+    --danger:   #f85149;
+    --success:  #3fb950;
+    --radius:   6px;
+    --panel-w:  260px;
+}
+
+/* ── App layout ───────────────────────────────────────────────────────────── */
+.app {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.overlay {
+    position: absolute;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none; /* children opt-in via pointer-events: auto */
+}
+
+.overlay > * { pointer-events: auto; }
+
+.overlay.top-left  { top: 12px; left: 12px; width: var(--panel-w); }
+.overlay.bottom-right { bottom: 12px; right: 12px; }
+
+/* ── Panel card ───────────────────────────────────────────────────────────── */
+.panel {
+    background: var(--bg1);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+}
+
+/* ── Inputs ───────────────────────────────────────────────────────────────── */
+.path-input {
+    width: 100%;
+    background: var(--bg0);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    padding: 6px 8px;
+    font-size: 12px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    transition: border-color .15s;
+}
+
+.path-input::placeholder { color: var(--bg3); }
+.path-input:focus { outline: none; border-color: var(--accent); }
+.path-input:disabled { opacity: 0.5; }
+
+/* ── Buttons ─────────────────────────────────────────────────────────────── */
+.btn {
+    flex: 1;
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg2);
+    color: var(--text);
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    transition: background .15s, border-color .15s;
+}
+
+.btn:hover:not(:disabled) { background: var(--bg3); border-color: #8b949e; }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.btn.btn-primary {
+    background: var(--accent-bg);
+    border-color: var(--accent);
+    color: #fff;
+}
+.btn.btn-primary:hover:not(:disabled) { background: #2860c4; }
+
+.button-row { display: flex; gap: 6px; }
+
+/* ── Checkboxes & labels ─────────────────────────────────────────────────── */
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--text-dim);
+    cursor: pointer;
+    user-select: none;
+}
+
+.checkbox-label input[type="checkbox"] {
+    accent-color: var(--accent);
+    cursor: pointer;
+    width: 13px;
+    height: 13px;
+}
+
+.checkbox-label input:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Segmented control ───────────────────────────────────────────────────── */
+.seg-control {
+    display: flex;
+    background: var(--bg0);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+}
+
+.seg-btn {
+    flex: 1;
+    padding: 5px 8px;
+    border: none;
+    background: transparent;
+    color: var(--text-dim);
+    cursor: pointer;
+    font-size: 12px;
+    transition: background .15s, color .15s;
+}
+
+.seg-btn + .seg-btn { border-left: 1px solid var(--border); }
+.seg-btn:hover:not(.active) { background: var(--bg2); color: var(--text); }
+.seg-btn.active { background: var(--accent-bg); color: #fff; }
+
+/* ── Divider ─────────────────────────────────────────────────────────────── */
+.divider {
+    height: 1px;
+    background: var(--border);
+    margin: 2px 0;
+}
+
+/* ── Status / error ──────────────────────────────────────────────────────── */
+.status-msg {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-dim);
+    font-size: 11px;
+}
+
+.status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+    animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.25; }
+}
+
+.error-msg {
+    color: var(--danger);
+    font-size: 11px;
+    word-break: break-word;
+}
+
+/* ── Loading overlay ─────────────────────────────────────────────────────── */
+.loading-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.45);
+    z-index: 50;
+}
+
+.loading-spinner {
+    width: 36px; height: 36px;
+    border: 3px solid rgba(255,255,255,0.15);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.75s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Toolbar ─────────────────────────────────────────────────────────────── */
+.toolbar {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    background: var(--bg1);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 4px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+}
+
+.tool-btn {
+    width: 32px; height: 32px;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .12s;
+}
+
+.tool-btn:hover:not(:disabled) { background: var(--bg3); }
+.tool-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.tool-btn.active { background: var(--accent-bg); color: #fff; }
+
+.toolbar-sep {
+    height: 1px;
+    background: var(--border);
+    margin: 2px 0;
+}
+
+/* ── Spinner inline ──────────────────────────────────────────────────────── */
+.spin { display: inline-block; animation: spin 0.7s linear infinite; }
