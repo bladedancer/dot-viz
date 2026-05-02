@@ -21,6 +21,7 @@ const sigmaSettings = {
     defaultEdgeType:  'arrow',
     hideEdgesOnMove:  true,
     hideLabelsOnMove: false,
+    allowInvalidContainer: true,
 };
 
 export default function Viewer({ nodeData, loading }) {
