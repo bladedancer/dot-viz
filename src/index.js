@@ -27,11 +27,11 @@ app.post('/api/generate', (req, res, next) => {
     if (!req.file) {
         return res.status(400).json({ error: 'No pom.xml uploaded' });
     }
-    const includes = Array.isArray(req.body.includes)
-        ? req.body.includes.join(',')
-        : (req.body.includes || '');
+    const groupFilter = Array.isArray(req.body.groupFilter)
+        ? req.body.groupFilter.join(',')
+        : (req.body.groupFilter || '');
     try {
-        const dot = await generateDot(req.file.buffer.toString('utf8'), includes);
+        const dot = await generateDot(req.file.buffer.toString('utf8'), groupFilter);
         res.type('text/plain').send(dot);
     } catch (err) {
         const message = err.stderr || err.message || String(err);
