@@ -3,7 +3,7 @@ import FA2Layout from 'graphology-layout-forceatlas2/worker';
 import forceAtlas2 from 'graphology-layout-forceatlas2';
 import dagre from '@dagrejs/dagre';
 
-const FA2_TIMEOUT_MS = 5000;
+const FA2_TIMEOUT_MS = 15000;
 
 function stopSupervisor(supervisorRef, timerRef) {
     if (timerRef.current) {
@@ -19,7 +19,7 @@ function stopSupervisor(supervisorRef, timerRef) {
 function runDagre(graph, sigma) {
     try {
         const g = new dagre.graphlib.Graph();
-        g.setGraph({ rankdir: 'LR', nodesep: 40, ranksep: 80 });
+        g.setGraph({ rankdir: 'LR', nodesep: 80, ranksep: 200 });
         g.setDefaultEdgeLabel(() => ({}));
 
         graph.forEachNode((id, attrs) => {
@@ -38,19 +38,28 @@ function runDagre(graph, sigma) {
                 graph.setNodeAttribute(id, 'y', pos.y);
             }
         });
+        // refresh() triggers re-normalization; wait one frame before resetting camera
+        // so sigma's normalization is current before animatedReset maps to it
         sigma.refresh();
+        requestAnimationFrame(() => sigma.getCamera().animatedReset({ duration: 200 }));
     } catch (err) {
         console.error('Dagre layout failed:', err);
     }
 }
 
-function startFA2(graph, supervisorRef, timerRef) {
+function startFA2(graph, sigma, supervisorRef, timerRef) {
     stopSupervisor(supervisorRef, timerRef);
     if (!graph.order) return;
 
-    const settings = forceAtlas2.inferSettings(graph);
+    const inferred = forceAtlas2.inferSettings(graph);
     const supervisor = new FA2Layout(graph, {
-        settings: { ...settings, barnesHutOptimize: true },
+        settings: {
+            ...inferred,
+            barnesHutOptimize: graph.order > 200,
+            gravity: 1,
+            scalingRatio: 10,
+            slowDown: Math.max(1, Math.log(graph.order)),
+        },
     });
     supervisorRef.current = supervisor;
     supervisor.start();
@@ -60,6 +69,8 @@ function startFA2(graph, supervisorRef, timerRef) {
             supervisor.kill();
             supervisorRef.current = null;
             timerRef.current = null;
+            sigma.refresh();
+            requestAnimationFrame(() => sigma.getCamera().animatedReset({ duration: 400 }));
         }
     }, FA2_TIMEOUT_MS);
 }
@@ -77,7 +88,7 @@ export function useLayout(sigma, graph, graphVersion) {
             stopSupervisor(supervisorRef, timerRef);
             runDagre(graph, sigma);
         } else {
-            startFA2(graph, supervisorRef, timerRef);
+            startFA2(graph, sigma, supervisorRef, timerRef);
         }
     });
 
@@ -89,7 +100,7 @@ export function useLayout(sigma, graph, graphVersion) {
             stopSupervisor(supervisorRef, timerRef);
             runDagre(graph, sigma);
         } else {
-            startFA2(graph, supervisorRef, timerRef);
+            startFA2(graph, sigma, supervisorRef, timerRef);
         }
 
         return () => stopSupervisor(supervisorRef, timerRef);
@@ -104,7 +115,7 @@ export function useLayout(sigma, graph, graphVersion) {
                 stopSupervisor(supervisorRef, timerRef);
                 runDagre(graph, sigma);
             } else {
-                startFA2(graph, supervisorRef, timerRef);
+                startFA2(graph, sigma, supervisorRef, timerRef);
             }
         };
     }, [sigma, graph]);

@@ -1,5 +1,4 @@
 import Graph from 'graphology';
-import dagre from '@dagrejs/dagre';
 
 export const LABEL_FONT = '12px monospace'; // must match Sigma's labelFont setting
 const LABEL_HEIGHT = 24;
@@ -16,32 +15,13 @@ function measureLabel(text) {
     return 120; // fallback for environments without OffscreenCanvas
 }
 
-function seedWithDagre(graph) {
-    try {
-        const g = new dagre.graphlib.Graph();
-        g.setGraph({ rankdir: 'TB', nodesep: 60, ranksep: 100 }); // TB for seed; interactive hierarchy mode uses LR
-        g.setDefaultEdgeLabel(() => ({}));
-
-        graph.forEachNode((id, attrs) => {
-            g.setNode(id, { width: attrs.labelWidth || 80, height: LABEL_HEIGHT });
-        });
-        graph.forEachEdge((_, attrs, src, tgt) => {
-            if (attrs.linkType !== 'grouping') g.setEdge(src, tgt);
-        });
-
-        dagre.layout(g);
-
-        graph.forEachNode((id) => {
-            const pos = g.node(id);
-            if (pos) {
-                graph.setNodeAttribute(id, 'x', pos.x);
-                graph.setNodeAttribute(id, 'y', pos.y);
-            }
-        });
-    } catch (err) {
-        console.warn('buildGraph: Dagre seed failed, using zero positions', err);
-        // FA2 will still run from (0,0) — not ideal but recoverable
-    }
+function seedRandom(graph) {
+    const n = graph.order;
+    const spread = Math.max(1000, n * 10);
+    graph.forEachNode((id) => {
+        graph.setNodeAttribute(id, 'x', (Math.random() - 0.5) * spread);
+        graph.setNodeAttribute(id, 'y', (Math.random() - 0.5) * spread);
+    });
 }
 
 export function buildGraph(nodeData) {
@@ -84,8 +64,8 @@ export function buildGraph(nodeData) {
         }
     }
 
-    // Seed initial positions from Dagre hierarchy so FA2 starts from a legible state
-    seedWithDagre(graph);
+    // Random spread gives FA2 room to work from the start
+    seedRandom(graph);
 
     return graph;
 }
