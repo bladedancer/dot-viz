@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { useStore } from '../store.jsx';
 
 const RANKDIR_OPTIONS = [
@@ -63,24 +63,15 @@ function SelectRow({ label, value, options, onChange }) {
     );
 }
 
-export default function LayoutPopover({ mode, onClose }) {
+export default function LayoutPopover({ mode }) {
     const { state, dispatch } = useStore();
     const { force, dagre } = state.layoutSettings;
-    const ref = useRef(null);
 
     const setForce = (patch) => dispatch({ type: 'SET_LAYOUT_SETTINGS', force: patch });
     const setDagre = (patch) => dispatch({ type: 'SET_LAYOUT_SETTINGS', dagre: patch });
 
-    useEffect(() => {
-        const handler = (e) => {
-            if (ref.current && !ref.current.contains(e.target)) onClose();
-        };
-        document.addEventListener('mousedown', handler);
-        return () => document.removeEventListener('mousedown', handler);
-    }, [onClose]);
-
     return (
-        <div className="layout-popover" ref={ref}>
+        <div className="layout-popover">
             {mode === 'force' ? (
                 <>
                     <div className="popover-title">Force settings</div>

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useStore } from '../store.jsx';
 import LayoutPopover from './LayoutPopover.jsx';
 
@@ -6,12 +6,24 @@ const Toolbar = () => {
     const { state, dispatch } = useStore();
     const [layoutMode, setLayoutMode] = useState('force');
     const [settingsOpen, setSettingsOpen] = useState(false);
+    const popoverRef = useRef(null);
 
     useEffect(() => {
         const handler = (e) => setLayoutMode(e.detail);
         window.addEventListener('sigma:layout-mode-changed', handler);
         return () => window.removeEventListener('sigma:layout-mode-changed', handler);
     }, []);
+
+    useEffect(() => {
+        if (!settingsOpen) return;
+        const handler = (e) => {
+            if (popoverRef.current && !popoverRef.current.contains(e.target)) {
+                setSettingsOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, [settingsOpen]);
 
     const rerun  = () => window.dispatchEvent(new Event('sigma:rerun-layout'));
     const fitAll = () => window.dispatchEvent(new Event('sigma:fit-all'));
@@ -42,18 +54,15 @@ const Toolbar = () => {
         }
     };
 
-    const handleClose = useCallback(() => setSettingsOpen(false), []);
-
     const setSource = (s) => dispatch({ type: 'SET_SOURCE', source: s });
     const hasSelection = state.selection.length > 0;
 
     return (
         <div className="toolbar" style={{ position: 'relative' }}>
             {settingsOpen && (
-                <LayoutPopover
-                    mode={layoutMode}
-                    onClose={handleClose}
-                />
+                <div ref={popoverRef}>
+                    <LayoutPopover mode={layoutMode} />
+                </div>
             )}
             <button className="tool-btn" title="Zoom in"       onClick={zoomIn}>+</button>
             <button className="tool-btn" title="Zoom out"      onClick={zoomOut}>−</button>
