@@ -172,21 +172,15 @@ export default class RoundedRectProgram extends NodeProgram {
         gl.uniform1f(u_correctionRatio, params.correctionRatio);
         gl.uniformMatrix3fv(u_matrix, false, params.matrix);
     }
-}
 
-// Canvas function that draws text centered inside the node box
-// Sigma calls this instead of the default disc label renderer
-export function drawRoundedRectLabel(context, data, settings) {
-    if (!data.label) return;
-    const size = settings.labelSize || 12;
-    context.font = `${settings.labelWeight || '400'} ${size}px ${settings.labelFont || 'monospace'}`;
-    context.fillStyle = (settings.labelColor && settings.labelColor.color) || '#c9d1d9';
-    context.textAlign = 'center';
-    context.textBaseline = 'middle';
-    context.fillText(data.label, data.x, data.y);
-}
-
-// Hover: draw the same text with a lighter glow
-export function drawRoundedRectHover(context, data, settings) {
-    drawRoundedRectLabel(context, data, settings);
+    // Sigma calls drawLabel on the program instance for nodes of this type
+    drawLabel(context, data, settings) {
+        if (!data.label) return;
+        const size = settings.labelSize || 12;
+        context.font = `${settings.labelWeight || '400'} ${size}px ${settings.labelFont || 'monospace'}`;
+        context.fillStyle = (settings.labelColor && settings.labelColor.color) || '#c9d1d9';
+        context.textAlign = 'center';
+        context.textBaseline = 'middle';
+        context.fillText(data.label, data.x, data.y);
+    }
 }

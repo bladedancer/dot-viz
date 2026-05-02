@@ -1,6 +1,6 @@
 import React from 'react';
 import { SigmaContainer } from '@react-sigma/core';
-import RoundedRectProgram, { drawRoundedRectLabel, drawRoundedRectHover } from './nodeProgram.js';
+import RoundedRectProgram from './nodeProgram.js';
 import { LABEL_FONT } from './buildGraph.js';
 import { GraphLoader, GraphEffects } from './GraphEffects.jsx';
 
@@ -12,8 +12,6 @@ const sigmaSettings = {
     labelColor:       { color: '#c9d1d9' },
     labelSize:        12,
     labelWeight:      '400',
-    labelRenderer:    drawRoundedRectLabel,
-    hoverRenderer:    drawRoundedRectHover,
     minCameraRatio:   0.05,
     maxCameraRatio:   10,
     renderEdgeLabels: false,
