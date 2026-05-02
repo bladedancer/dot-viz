@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useStore } from '../store.jsx';
 import LayoutPopover from './LayoutPopover.jsx';
 
@@ -6,7 +6,6 @@ const Toolbar = () => {
     const { state, dispatch } = useStore();
     const [layoutMode, setLayoutMode] = useState('force');
     const [settingsOpen, setSettingsOpen] = useState(false);
-    const toolbarRef = useRef(null);
 
     useEffect(() => {
         const handler = (e) => setLayoutMode(e.detail);
@@ -49,7 +48,7 @@ const Toolbar = () => {
     const hasSelection = state.selection.length > 0;
 
     return (
-        <div className="toolbar" ref={toolbarRef} style={{ position: 'relative' }}>
+        <div className="toolbar" style={{ position: 'relative' }}>
             {settingsOpen && (
                 <LayoutPopover
                     mode={layoutMode}
