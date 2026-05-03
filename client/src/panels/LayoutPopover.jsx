@@ -84,7 +84,7 @@ export default function LayoutPopover({ mode }) {
                     <SliderRow
                         label="Scaling"
                         value={force.scalingRatio}
-                        min={1} max={50} step={1}
+                        min={1} max={500} step={1}
                         onChange={(v) => setForce({ scalingRatio: v })}
                     />
                     <SliderRow
