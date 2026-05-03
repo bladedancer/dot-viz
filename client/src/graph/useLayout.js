@@ -49,14 +49,14 @@ function runDagre(graph, sigma, dagreSettings) {
     }
 }
 
-function runNoverlap(graph, sigma) {
+function runNoverlap(graph, sigma, forceSettings) {
     // Use half-diagonal of the node's bounding box as collision radius
     graph.forEachNode((id, attrs) => {
         const w = attrs.labelWidth  || 80;
         const h = attrs.labelHeight || 24;
         graph.setNodeAttribute(id, 'size', Math.ceil(Math.sqrt(w * w + h * h) / 2));
     });
-    noverlap(graph, { maxIterations: 200, settings: { margin: 4 } });
+    noverlap(graph, { maxIterations: 200, settings: { margin: forceSettings.noverlapMargin ?? 4 } });
     graph.forEachNode((id) => graph.setNodeAttribute(id, 'size', 4));
     sigma.refresh();
 }
@@ -85,7 +85,7 @@ function startFA2(graph, sigma, supervisorRef, timerRef, forceSettings) {
             supervisor.kill();
             supervisorRef.current = null;
             timerRef.current = null;
-            runNoverlap(graph, sigma);
+            runNoverlap(graph, sigma, forceSettings);
             requestAnimationFrame(() => sigma.getCamera().animatedReset({ duration: 400 }));
         }
     }, forceSettings.timeoutMs);

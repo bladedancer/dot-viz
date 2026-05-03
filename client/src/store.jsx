@@ -14,8 +14,9 @@ const initialState = {
             scalingRatio:  10,
             slowDown:      null,
             timeoutMs:     15000,
-            linLogMode:    false,
-            strongGravity: false,
+            linLogMode:     false,
+            strongGravity:  false,
+            noverlapMargin: 4,
         },
         dagre: {
             rankdir: 'LR',

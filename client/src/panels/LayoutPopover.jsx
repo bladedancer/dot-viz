@@ -116,6 +116,12 @@ export default function LayoutPopover({ mode }) {
                         checked={force.strongGravity}
                         onChange={(v) => setForce({ strongGravity: v })}
                     />
+                    <SliderRow
+                        label="Overlap margin"
+                        value={force.noverlapMargin}
+                        min={0} max={40} step={1}
+                        onChange={(v) => setForce({ noverlapMargin: v })}
+                    />
                 </>
             ) : (
                 <>
