@@ -13,35 +13,44 @@ export function useFilter(sigma, graph, nodeFilter, edgeFilter, graphVersion, vi
 
         // ── Connected mode: BFS from selected nodes ───────────────────────────
         if (nodeFilter.connected) {
-            const seeds = (selection || []).filter((id) => graph.hasNode(id));
+            const seeds   = (selection || []).filter((id) => graph.hasNode(id));
             const visible = new Set(seeds);
 
-            for (const seed of seeds) {
-                const queue   = [seed];
-                const visited = new Set([seed]);
-
+            const bfs = (startNodes, getNeighbors) => {
+                const queue   = [...startNodes];
+                const visited = new Set(startNodes);
                 while (queue.length) {
-                    const current   = queue.shift();
-                    const neighbors = [];
-
-                    if (direction === 'outbound' || direction === 'both') {
-                        graph.forEachOutEdge(current, (_, edgeAttrs, _src, tgt) => {
-                            if (edgeFilter[edgeAttrs.linkType] && !visited.has(tgt)) neighbors.push(tgt);
-                        });
-                    }
-                    if (direction === 'inbound' || direction === 'both') {
-                        graph.forEachInEdge(current, (_, edgeAttrs, src) => {
-                            if (edgeFilter[edgeAttrs.linkType] && !visited.has(src)) neighbors.push(src);
-                        });
-                    }
-
-                    for (const nb of neighbors) {
-                        visited.add(nb);
-                        visible.add(nb);
-                        queue.push(nb);
+                    const current = queue.shift();
+                    for (const nb of getNeighbors(current)) {
+                        if (!visited.has(nb)) {
+                            visited.add(nb);
+                            visible.add(nb);
+                            queue.push(nb);
+                        }
                     }
                 }
-            }
+            };
+
+            const outNeighbors = (id) => {
+                const r = [];
+                graph.forEachOutEdge(id, (_, edgeAttrs, _src, tgt) => {
+                    if (edgeFilter[edgeAttrs.linkType]) r.push(tgt);
+                });
+                return r;
+            };
+
+            const inNeighbors = (id) => {
+                const r = [];
+                graph.forEachInEdge(id, (_, edgeAttrs, src) => {
+                    if (edgeFilter[edgeAttrs.linkType]) r.push(src);
+                });
+                return r;
+            };
+
+            // Run each direction as an independent BFS so visited sets don't
+            // interfere — 'both' is the true union of outbound and inbound results.
+            if (direction === 'outbound' || direction === 'both') bfs(seeds, outNeighbors);
+            if (direction === 'inbound'  || direction === 'both') bfs(seeds, inNeighbors);
 
             visibleIdsRef.current = visible;
             sigma.refresh();
