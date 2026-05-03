@@ -4,6 +4,7 @@ import Viewer from './graph/Viewer.jsx';
 import PomPanel from './panels/PomPanel.jsx';
 import FilterPanel from './panels/FilterPanel.jsx';
 import Toolbar from './panels/Toolbar.jsx';
+import Legend from './panels/Legend.jsx';
 import './theme.css';
 
 function AppInner() {
@@ -18,6 +19,10 @@ function AppInner() {
             <div className="overlay top-left">
                 <PomPanel />
                 <FilterPanel />
+            </div>
+
+            <div className="overlay top-right">
+                <Legend />
             </div>
 
             <div className="overlay bottom-right">

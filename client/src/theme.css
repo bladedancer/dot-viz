@@ -57,7 +57,8 @@ div.sigma-container {
 
 .overlay > * { pointer-events: auto; }
 
-.overlay.top-left  { top: 12px; left: 12px; width: var(--panel-w); }
+.overlay.top-left     { top: 12px; left: 12px; width: var(--panel-w); }
+.overlay.top-right    { top: 12px; right: 12px; width: var(--panel-w); }
 .overlay.bottom-right { bottom: 12px; right: 12px; }
 
 /* ── Panel card ───────────────────────────────────────────────────────────── */
@@ -252,6 +253,34 @@ div.sigma-container {
     height: 1px;
     background: var(--border);
     margin: 2px 0;
+}
+
+/* ── Legend ──────────────────────────────────────────────────────────────── */
+.legend {
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.legend-row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.legend-swatch {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+.legend-label {
+    font-size: 11px;
+    color: var(--text-dim);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 180px;
 }
 
 /* ── Spinner inline ──────────────────────────────────────────────────────── */
