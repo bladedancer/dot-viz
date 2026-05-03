@@ -102,9 +102,8 @@ void main() {
     float alpha = 1.0 - smoothstep(-border, 0.0, d);
 
     vec3 col = v_color.rgb;
-    if (v_highlighted > 0.5) col = min(col * 1.6, vec3(1.0));
 
-    if (v_isRoot > 0.5) {
+    if (v_isRoot > 0.5 || v_highlighted > 0.5) {
         float borderWidth = 2.5 * v_correctionRatio;
         float innerD = roundedBoxSDF(pos, halfSize - borderWidth, r - borderWidth);
         float outerAlpha = alpha;
@@ -184,8 +183,7 @@ export default class RoundedRectProgram extends NodeProgram {
         context.fillText(data.label, data.x, data.y);
     }
 
-    // WebGL layer handles the highlight (brightened color); just redraw the label
-    // on the hover canvas layer so it appears above the node box.
+    // Redraw the label on the hover canvas layer so it appears above the node box.
     // Cannot delegate to this.drawLabel — Sigma calls drawHover without binding the instance.
     drawHover(context, data, settings) {
         if (!data.label) return;

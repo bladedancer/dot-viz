@@ -27,10 +27,12 @@ export function GraphEffects() {
     const { nodeFilter, edgeFilter, graphVersion, layoutSettings, groupSelection, selection } = state;
     const registerEvents = useRegisterEvents();
 
-    const hoveredNodeRef = useRef(null);
-    const visibleIdsRef  = useRef(new Set());
-    const edgeFilterRef  = useRef(edgeFilter);
+    const hoveredNodeRef   = useRef(null);
+    const selectionSetRef  = useRef(new Set());
+    const visibleIdsRef    = useRef(new Set());
+    const edgeFilterRef    = useRef(edgeFilter);
     useEffect(() => { edgeFilterRef.current = edgeFilter; }, [edgeFilter]);
+    useEffect(() => { selectionSetRef.current = new Set(selection); sigma.refresh(); }, [selection, sigma]);
 
     // Install composed reducers once on mount — read from refs, never stale
     useEffect(() => {
@@ -38,7 +40,9 @@ export function GraphEffects() {
             if (visibleIdsRef.current.size > 0 && !visibleIdsRef.current.has(nodeId)) {
                 return { ...data, hidden: true };
             }
-            if (nodeId === hoveredNodeRef.current) return { ...data, highlighted: true };
+            if (nodeId === hoveredNodeRef.current || selectionSetRef.current.has(nodeId)) {
+                return { ...data, highlighted: true };
+            }
             return data;
         });
         sigma.setSetting('edgeReducer', (edgeId, data) => {
