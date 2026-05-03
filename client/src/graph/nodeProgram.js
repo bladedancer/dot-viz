@@ -183,4 +183,10 @@ export default class RoundedRectProgram extends NodeProgram {
         context.textBaseline = 'middle';
         context.fillText(data.label, data.x, data.y);
     }
+
+    // WebGL layer handles the highlight (brightened color); just redraw the label
+    // on the hover canvas layer so it appears above the node box.
+    drawHover(context, data, settings) {
+        this.drawLabel(context, data, settings);
+    }
 }
