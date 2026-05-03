@@ -186,7 +186,14 @@ export default class RoundedRectProgram extends NodeProgram {
 
     // WebGL layer handles the highlight (brightened color); just redraw the label
     // on the hover canvas layer so it appears above the node box.
+    // Cannot delegate to this.drawLabel — Sigma calls drawHover without binding the instance.
     drawHover(context, data, settings) {
-        this.drawLabel(context, data, settings);
+        if (!data.label) return;
+        const size = settings.labelSize || 12;
+        context.font = `${settings.labelWeight || '400'} ${size}px ${settings.labelFont || 'monospace'}`;
+        context.fillStyle = (settings.labelColor && settings.labelColor.color) || '#c9d1d9';
+        context.textAlign = 'center';
+        context.textBaseline = 'middle';
+        context.fillText(data.label, data.x, data.y);
     }
 }
