@@ -24,7 +24,7 @@ export function GraphEffects() {
     const sigma = useSigma();
     const graph = sigma.getGraph();
     const { state, dispatch } = useStore();
-    const { nodeFilter, edgeFilter, graphVersion, layoutSettings } = state;
+    const { nodeFilter, edgeFilter, graphVersion, layoutSettings, groupSelection } = state;
     const registerEvents = useRegisterEvents();
 
     const hoveredNodeRef = useRef(null);
@@ -52,7 +52,7 @@ export function GraphEffects() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    useFilter(sigma, graph, nodeFilter, edgeFilter, graphVersion, visibleIdsRef);
+    useFilter(sigma, graph, nodeFilter, edgeFilter, graphVersion, visibleIdsRef, groupSelection);
 
     const { layoutMode, setLayoutMode, runLayout } = useLayout(sigma, graph, graphVersion, layoutSettings);
 

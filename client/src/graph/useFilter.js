@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-export function useFilter(sigma, graph, nodeFilter, edgeFilter, graphVersion, visibleIdsRef) {
+export function useFilter(sigma, graph, nodeFilter, edgeFilter, graphVersion, visibleIdsRef, groupSelection) {
     useEffect(() => {
         if (!graph || !graph.order) {
             visibleIdsRef.current = new Set();
@@ -8,22 +8,23 @@ export function useFilter(sigma, graph, nodeFilter, edgeFilter, graphVersion, vi
         }
 
         const filterText = nodeFilter.text ? nodeFilter.text.toLowerCase() : '';
+        const activeGroups = groupSelection && groupSelection.length > 0 ? new Set(groupSelection) : null;
 
-        if (!filterText) {
+        if (!filterText && !activeGroups) {
             visibleIdsRef.current = new Set(graph.nodes());
             sigma.refresh();
             return;
         }
 
-        // Step 1: find text-matching seed nodes
+        // Step 1: find text-matching seed nodes (filtered by group selection if active)
         const seeds = [];
         graph.forEachNode((id, attrs) => {
-            if (attrs.label && attrs.label.toLowerCase().includes(filterText)) {
-                seeds.push(id);
-            }
+            if (activeGroups && !activeGroups.has(attrs.group)) return;
+            if (filterText && !(attrs.label && attrs.label.toLowerCase().includes(filterText))) return;
+            seeds.push(id);
         });
 
-        if (!nodeFilter.connected) {
+        if (!nodeFilter.connected || !filterText) {
             visibleIdsRef.current = new Set(seeds);
             sigma.refresh();
             return;
@@ -69,6 +70,6 @@ export function useFilter(sigma, graph, nodeFilter, edgeFilter, graphVersion, vi
         visibleIdsRef.current = visible;
         sigma.refresh();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [sigma, graph, nodeFilter, edgeFilter, graphVersion]);
+    }, [sigma, graph, nodeFilter, edgeFilter, graphVersion, groupSelection]);
     // visibleIdsRef is a ref — intentionally not in deps
 }

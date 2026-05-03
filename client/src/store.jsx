@@ -8,6 +8,7 @@ const initialState = {
     nodeFilter: { text: '', connected: false, direction: 'both' },
     edgeFilter: { compile: true, provided: true, test: false, grouping: true },
     selection: [],
+    groupSelection: [],
     layoutSettings: {
         force: {
             gravity:       1,
@@ -42,6 +43,8 @@ function reducer(state, action) {
             return { ...state, edgeFilter: { ...state.edgeFilter, ...action.edgeFilter } };
         case 'SET_SELECTION':
             return { ...state, selection: action.selection };
+        case 'SET_GROUP_SELECTION':
+            return { ...state, groupSelection: action.groupSelection };
         case 'SET_LAYOUT_SETTINGS':
             return {
                 ...state,

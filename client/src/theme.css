@@ -265,6 +265,27 @@ div.sigma-container {
     display: flex;
     align-items: center;
     gap: 7px;
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    transition: background .1s, opacity .1s;
+    user-select: none;
+}
+
+.legend-row:hover { background: var(--bg2); }
+.legend-row.active { border-color: var(--accent); background: var(--accent-bg); }
+.legend-row.dimmed { opacity: 0.35; }
+
+.legend-clear {
+    font-size: 10px;
+    color: var(--accent);
+    background: none;
+    border: none;
+    padding: 0 2px 4px;
+    cursor: pointer;
+    text-decoration: underline;
+    align-self: flex-end;
 }
 
 .legend-swatch {
