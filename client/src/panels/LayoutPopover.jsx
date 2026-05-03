@@ -122,6 +122,12 @@ export default function LayoutPopover({ mode }) {
                         min={0} max={40} step={1}
                         onChange={(v) => setForce({ noverlapMargin: v })}
                     />
+                    <SliderRow
+                        label="Group repulsion"
+                        value={force.groupRepulsion}
+                        min={0} max={500} step={10}
+                        onChange={(v) => setForce({ groupRepulsion: v })}
+                    />
                 </>
             ) : (
                 <>

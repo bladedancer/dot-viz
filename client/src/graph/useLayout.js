@@ -49,6 +49,62 @@ function runDagre(graph, sigma, dagreSettings) {
     }
 }
 
+function separateGroups(graph, strength) {
+    if (!strength) return;
+
+    // Build per-group centroid and member list
+    const groups = new Map();
+    graph.forEachNode((id, attrs) => {
+        const g = attrs.group || '__none__';
+        if (!groups.has(g)) groups.set(g, { nodes: [], cx: 0, cy: 0 });
+        groups.get(g).nodes.push(id);
+    });
+    if (groups.size < 2) return;
+
+    const groupKeys = [...groups.keys()];
+    const ITERS = 30;
+
+    for (let iter = 0; iter < ITERS; iter++) {
+        // Recompute centroids
+        for (const [, grp] of groups) {
+            let sx = 0, sy = 0;
+            for (const id of grp.nodes) {
+                sx += graph.getNodeAttribute(id, 'x');
+                sy += graph.getNodeAttribute(id, 'y');
+            }
+            grp.cx = sx / grp.nodes.length;
+            grp.cy = sy / grp.nodes.length;
+        }
+
+        // Pairwise repulsion between group centroids
+        const delta = new Map(groupKeys.map((k) => [k, { dx: 0, dy: 0 }]));
+        for (let i = 0; i < groupKeys.length; i++) {
+            for (let j = i + 1; j < groupKeys.length; j++) {
+                const a = groups.get(groupKeys[i]);
+                const b = groups.get(groupKeys[j]);
+                const dx = b.cx - a.cx;
+                const dy = b.cy - a.cy;
+                const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+                const force = strength / (dist * dist);
+                const fx = (dx / dist) * force;
+                const fy = (dy / dist) * force;
+                delta.get(groupKeys[i]).dx -= fx;
+                delta.get(groupKeys[i]).dy -= fy;
+                delta.get(groupKeys[j]).dx += fx;
+                delta.get(groupKeys[j]).dy += fy;
+            }
+        }
+
+        // Apply displacement to all nodes in each group
+        for (const [key, d] of delta) {
+            for (const id of groups.get(key).nodes) {
+                graph.setNodeAttribute(id, 'x', graph.getNodeAttribute(id, 'x') + d.dx);
+                graph.setNodeAttribute(id, 'y', graph.getNodeAttribute(id, 'y') + d.dy);
+            }
+        }
+    }
+}
+
 function runNoverlap(graph, sigma, forceSettings) {
     // Use half-diagonal of the node's bounding box as collision radius
     graph.forEachNode((id, attrs) => {
@@ -58,6 +114,7 @@ function runNoverlap(graph, sigma, forceSettings) {
     });
     noverlap(graph, { maxIterations: 200, settings: { margin: forceSettings.noverlapMargin ?? 4 } });
     graph.forEachNode((id) => graph.setNodeAttribute(id, 'size', 4));
+    separateGroups(graph, forceSettings.groupRepulsion ?? 100);
     sigma.refresh();
 }
 
