@@ -17,7 +17,7 @@ const FilterPanel = () => {
     const setEdgeFilter = (ef) => dispatch({ type: 'SET_EDGE_FILTER', edgeFilter: ef });
 
     const debouncedText = useDebouncedCallback(
-        (text) => setNodeFilter({ text, connected: false }),
+        (text) => setNodeFilter({ text }),
         200
     );
 
@@ -37,7 +37,7 @@ const FilterPanel = () => {
                     checked={nodeFilter.connected}
                     onChange={(e) => setNodeFilter({ connected: e.target.checked })}
                 />
-                Connected nodes
+                Filter to selection + connected
             </label>
 
             {nodeFilter.connected && (
